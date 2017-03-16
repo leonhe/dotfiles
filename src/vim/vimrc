@@ -16,6 +16,7 @@ call vundle#begin("~/.vim/plugins")
     Plugin 'fatih/vim-go'
     Plugin 'Valloric/YouCompleteMe'
     Plugin 'vim-airline/vim-airline'
+    Plugin 'bronson/vim-crosshairs'
     Plugin 'marijnh/tern_for_vim'
     Plugin 'vim-airline/vim-airline-themes'
     Plugin 'ryanoasis/vim-devicons'
@@ -49,3 +50,14 @@ map <Leader>. <plug>NERDTreeFocusToggle<CR>
 " Tern	
 let g:tern_show_argument_hints='on_hold'
 let g:tern_map_keys=1
+
+
+
+
+" CrossHair
+set cursorline    " enable the horizontal line
+set cursorcolumn  " enable the vertical line
+
+
+
+

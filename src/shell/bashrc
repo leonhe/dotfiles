@@ -2,9 +2,3 @@
 
 
 . ~/.bash_profile
-
-
-[[ -s "/home/cescoferraro/.gvm/scripts/gvm" ]] && source "/home/cescoferraro/.gvm/scripts/gvm"
-
-export NVM_DIR="/home/cescoferraro/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

@@ -258,16 +258,12 @@ main() {
     ./create_symbolic_links.sh "$@"
 
 
-    print_in_purple "\n • Installs\n\n"
-    
-    ask_for_confirmation "Do you want to install stuff?"
-
-    if answer_is_yes; then
+ 
     
     
-        ./install/main.sh
-        ./preferences/main.sh
-    fi
+    ./install/main.sh
+    ./preferences/main.sh
+  
 
 
     if cmd_exists "git"; then

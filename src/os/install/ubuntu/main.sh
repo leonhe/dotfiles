@@ -95,7 +95,6 @@ main() {
     print_in_purple "\n • Ubuntu setup\n\n"
 
     update
-    upgrade
     printf "\n"
     install_apps
     printf "\n"

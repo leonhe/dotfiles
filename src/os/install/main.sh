@@ -38,4 +38,10 @@ ask_for_confirmation "Do you want to set vim environment?"
 if answer_is_yes; then
     ./vim.sh
 fi
+print_in_purple "\n • Emacs\n\n"
+
+ask_for_confirmation "Do you want to set emacs environment?"
+if answer_is_yes; then
+    ./emacs.sh
+fi
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd "$(dirname "${BASH_SOURCE[0]}")" \
-&& . "../utils.sh"
+    && . "../utils.sh"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -44,4 +44,3 @@ ask_for_confirmation "Do you want to set emacs environment?"
 if answer_is_yes; then
     ./emacs.sh
 fi
-

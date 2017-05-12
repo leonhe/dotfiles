@@ -330,9 +330,15 @@ narrowed."
    #+END_SRC
 * Org
   #+BEGIN_SRC emacs-lisp
-(use-package org :ensure t
+(use-package org
+  :after evil
+  :ensure t
   :config
 
+  (evil-define-key
+    'normal magit-mode-map (kbd "L") 'tabbar-forward)
+  (evil-define-key
+    'normal magit-mode-map (kbd "H") 'tabbar-backward)
   (require 'ox-latex)
   (use-package org-bullets
     :ensure t
@@ -514,9 +520,19 @@ narrowed."
   (set-face-foreground 'git-gutter-fr:deleted  "white")
   (setq git-gutter-fr:side 'left-fringe))
 
+(defun cesco/delete-repolist-item (&optional _button)
+  "Show the status for the repository at point."
+  (interactive)
+  (--if-let (tabulated-list-get-id)
+      (when (yes-or-no-p "Delete Project?")
+	(progn
+	  (delete-directory (expand-file-name it) t t ))
+	(cesco/magit-refresh))
+    (user-error "There is no repository at point")
+    ) )
 
-(defun cesco/refresh ()
-(interactive)
+(defun cesco/magit-refresh ()
+  (interactive)
   (kill-this-buffer)
   (magit-list-repositories)
   )
@@ -527,8 +543,9 @@ narrowed."
     (list 'normal 'insert 'visual 'motion)
     magit-repolist-mode-map
     (kbd "TAB") 'magit-repolist-status
+    (kbd "d") 'cesco/delete-repolist-item
     (kbd "q") 'kill-this-buffer
-    (kbd "r") 'cesco/refresh
+    (kbd "r") 'cesco/magit-refresh
     (kbd "RET") 'magit-repolist-status)
   (message "cesco/magit-repolist-hook")
   )
@@ -656,6 +673,7 @@ narrowed."
   :config (evil-leader/set-key "m" 'cesco/neotree-toogle)
   :init (progn
 	  (setq neo-theme (if window-system 'icons 'nerd)) ; 'classic, 'nerd, 'ascii, 'arrow
+      (setq neo-force-change-root t)
 	  (setq neo-show-hidden-files t)
 	  (add-hook 'neotree-mode-hook 'cesco/neotree-evil)))
    #+END_SRC
@@ -1215,8 +1233,6 @@ narrowed."
   :ensure t
   :config
   (set-default 'evil-symbol-word-search t)
-  (define-key evil-normal-state-map "L" 'tabbar-forward-tab)
-  (define-key evil-normal-state-map "H" 'tabbar-backward-tab)
   (evil-mode)
   )
    #+END_SRC

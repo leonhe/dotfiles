@@ -332,13 +332,8 @@ narrowed."
   #+BEGIN_SRC emacs-lisp
 (use-package org
   :after evil
-  :ensure t
   :config
 
-  (evil-define-key
-    'normal magit-mode-map (kbd "L") 'tabbar-forward)
-  (evil-define-key
-    'normal magit-mode-map (kbd "H") 'tabbar-backward)
   (require 'ox-latex)
   (use-package org-bullets
     :ensure t
@@ -375,6 +370,14 @@ narrowed."
 
   #+END_SRC
 * Packages
+
+** JSON
+   #+begin_src emacs-lisp
+
+(defun my/json-mode-hook ()
+   (setq tab-width 1))
+(add-hook 'json-mode-hook 'my/json-mode-hook)
+   #+end_src
 
 ** Move-text
    #+begin_src emacs-lisp
@@ -1232,6 +1235,11 @@ narrowed."
   :after evil-leader
   :ensure t
   :config
+
+  (evil-define-key
+    'normal magit-mode-map (kbd "L") 'tabbar-forward)
+  (evil-define-key
+    'normal magit-mode-map (kbd "H") 'tabbar-backward)
   (set-default 'evil-symbol-word-search t)
   (evil-mode)
   )

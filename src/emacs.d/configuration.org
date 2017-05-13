@@ -549,11 +549,7 @@ narrowed."
     (user-error "There is no repository at point")
     ) )
 
-<<<<<<< HEAD
-(defun cesco/refresh ()
-=======
 (defun cesco/magit-refresh ()
->>>>>>> 15eda3cbc36c22f720f99b88975de353fa1ab201
   (interactive)
   (kill-this-buffer)
   (magit-list-repositories)
@@ -579,12 +575,8 @@ narrowed."
     (kbd "TAB") 'magit-repolist-status
     (kbd "d") 'cesco/delete-repolist-item
     (kbd "q") 'kill-this-buffer
-<<<<<<< HEAD
     (kbd "d") 'cesco/magit-repolist-delete
-    (kbd "r") 'cesco/refresh
-=======
     (kbd "r") 'cesco/magit-refresh
->>>>>>> 15eda3cbc36c22f720f99b88975de353fa1ab201
     (kbd "RET") 'magit-repolist-status)
   (message "cesco/magit-repolist-hook")
   )
@@ -1272,20 +1264,17 @@ narrowed."
   :ensure t
   :config
 
-  (evil-define-key
-    'normal magit-mode-map (kbd "L") 'tabbar-forward)
-  (evil-define-key
-    'normal magit-mode-map (kbd "H") 'tabbar-backward)
+
   (set-default 'evil-symbol-word-search t)
-<<<<<<< HEAD
+
+
   (define-key evil-normal-state-map "L" 'tabbar-forward-tab)
   (define-key evil-normal-state-map "H" 'tabbar-backward-tab)
 
 (evil-define-key 'normal evil-org-mode-map
   "H" 'tabbar-backward-tab
   "L" 'tabbar-forward-tab)
-=======
->>>>>>> 15eda3cbc36c22f720f99b88975de353fa1ab201
+
   (evil-mode)
   )
    #+END_SRC

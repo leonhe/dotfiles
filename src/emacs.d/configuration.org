@@ -1,4 +1,4 @@
-My emacs configuration! Enjoy
+My Emacs Configuration! Enjoy
 * Basic
   #+BEGIN_SRC emacs-lisp
 
@@ -14,17 +14,47 @@ My emacs configuration! Enjoy
   #+END_SRC
 * Setup
 
+** TODO TOOGLE
+   #+begin_src emacs-lisp
+(defun xah-toggle-letter-case ()
+  "Toggle the letter case of current word or text selection.
+Always cycle in this order: Init Caps, ALL CAPS, all lower.
+
+URL `http://ergoemacs.org/emacs/modernization_upcase-word.html'
+Version 2017-04-19"
+  (interactive)
+  (let (
+        (deactivate-mark nil)
+        -p1 -p2)
+    (if (use-region-p)
+        (setq -p1 (region-beginning)
+              -p2 (region-end))
+      (save-excursion
+        (skip-chars-backward "[:alnum:]-_")
+        (setq -p1 (point))
+        (skip-chars-forward "[:alnum:]-_")
+        (setq -p2 (point))))
+    (when (not (eq last-command this-command))
+      (put this-command 'state 0))
+    (cond
+     ((equal 0 (get this-command 'state))
+      (upcase-initials-region -p1 -p2)
+      (put this-command 'state 1))
+     ((equal 1  (get this-command 'state))
+      (upcase-region -p1 -p2)
+      (put this-command 'state 2))
+     ((equal 2 (get this-command 'state))
+      (downcase-region -p1 -p2)
+      (put this-command 'state 0)))))
+(global-set-key (kbd "C-c t") 'xah-toggle-letter-case)
+   #+end_src
+
 ** SLQ ORACLE
    #+begin_src emacs-lisp
 (setq sql-oracle-login-params
       '((user     :default "system")
         (password :default (password-read "Password:" "oracle"))
         (database :default "localhost:49161/xe")))
-   #+end_src
-
-** DEBUG
-   #+begin_src emacs-lisp
-(setq debug-on-error t)
    #+end_src
 
 ** HideShow Folding
@@ -386,13 +416,6 @@ narrowed."
   #+END_SRC
 * Packages
 
-** JSON
-   #+begin_src emacs-lisp
-
-(defun my/json-mode-hook ()
-   (setq tab-width 1))
-(add-hook 'json-mode-hook 'my/json-mode-hook)
-   #+end_src
 
 ** Move-text
    #+begin_src emacs-lisp
@@ -1280,7 +1303,6 @@ narrowed."
    #+END_SRC
 
 * Hydras
-
 ** Hydra Itself!
    #+begin_src emacs-lisp
 
@@ -1357,11 +1379,14 @@ narrowed."
 
 
 
-
 ** Personal Hydra!
    #+begin_src emacs-lisp
 (defhydra cesco/hydra ()
   "cesco"
+  ("=" text-scale-increase "in")
+  ("-" text-scale-decrease "out")
+  ("e" (lambda () (interactive)(find-file "~/.emacs.d/configuration.org")) "init.org" )
+  ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local" )
   (";" cesco/insert-semicolon  "insert semicolon" :color blue)
   ("g" magit-list-repositories "Magit-List-Repos" :color blue)
   ("p" cesco/automatic-push "Automatic push" :color blue )
@@ -1369,7 +1394,6 @@ narrowed."
 (global-set-key[(shift control d)] 'cesco/hydra/body)
 
    #+end_src
-
 
 
 ** Multiple Cursor

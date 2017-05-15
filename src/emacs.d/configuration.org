@@ -14,6 +14,12 @@ My Emacs Configuration! Enjoy
   #+END_SRC
 * Setup
 
+** shell
+   #+begin_src emacs-lisp
+(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+   #+end_src
+
 ** TODO TOOGLE
    #+begin_src emacs-lisp
 (defun xah-toggle-letter-case ()

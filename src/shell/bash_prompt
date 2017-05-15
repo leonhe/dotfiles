@@ -101,14 +101,10 @@ set_prompts() {
 
     White="$(tput setaf 7)"
     Cyan="$(tput setaf 6)"
-    Blue="$(tput setaf 4)"
+    Blue="$(tput setaf 1)"
     Magenta="$(tput setaf 5)"
-    Git="$(get_git_repository_details)"
-    Bold="$(tput bold)"
-    Reset="$(tput sgr0)"
-    First="\[$White\]\u\[$Reset\] \\[$White\]in\[$Reset\] \\[$Blue\]\w\[$Reset\]\n"
-    Second="\[$Magenta\]$ \[$Reset\]"
-    export PS1="$First$Second"
+    Seco="$Cyan└─$Magenta $White⚡ $White "
+    export PS1='\[$Magenta\] \w\[$Blue\]$(__git_ps1)\n$Seco'
 
 
 

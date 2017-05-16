@@ -567,6 +567,12 @@ narrowed."
   (set-face-foreground 'git-gutter-fr:deleted  "white")
   (setq git-gutter-fr:side 'left-fringe))
 
+(defun cesco/magit-refresh ()
+  (interactive)
+  (kill-this-buffer)
+  (magit-list-repositories)
+  )
+
 (defun cesco/delete-repolist-item (&optional _button)
   "Show the status for the repository at point."
   (interactive)
@@ -578,11 +584,6 @@ narrowed."
     (user-error "There is no repository at point")
     ) )
 
-(defun cesco/magit-refresh ()
-  (interactive)
-  (kill-this-buffer)
-  (magit-list-repositories)
-  )
 
 (defun cesco/magit-repolist-delete (&optional _button)
   "Show the status for the repository at point."
@@ -1076,7 +1077,7 @@ narrowed."
   :config (add-hook 'groovy-mode-hook 'turn-on-evil-mode))
 
 (use-package gradle-mode
-  :ensure gradle-mode
+  :ensure t
   :diminish gradle-mode
   :config
   (progn
@@ -1086,6 +1087,9 @@ narrowed."
 
     (define-key gradle-mode-map (kbd "C-c C-r") 'build-and-run)
     ))
+
+(add-hook 'java-mode-hook '(lambda() (gradle-mode 1)))
+
     #+END_SRC
 *** Eclim
     #+BEGIN_SRC emacs-lisp
@@ -1391,8 +1395,8 @@ narrowed."
   "cesco"
   ("=" text-scale-increase "in")
   ("-" text-scale-decrease "out")
-  ("e" (lambda () (interactive)(find-file "~/.emacs.d/configuration.org")) "init.org" )
-  ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local" )
+  ("e" (lambda () (interactive)(find-file "~/.emacs.d/configuration.org")) "init.org"  :color blue)
+  ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local"  :color blue)
   (";" cesco/insert-semicolon  "insert semicolon" :color blue)
   ("g" magit-list-repositories "Magit-List-Repos" :color blue)
   ("p" cesco/automatic-push "Automatic push" :color blue )

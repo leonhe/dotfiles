@@ -131,6 +131,7 @@ Version 2017-04-19"
    #+BEGIN_SRC emacs-lisp
 (setq mac-option-modifier 'meta)
 (setq mac-command-modifier 'control)
+(setq mac-pass-command-to-system nil)
 (setq mac-control-modifier 'super)
    #+END_SRC
 ** REplace region when typing
@@ -423,6 +424,82 @@ narrowed."
 * Packages
 
 
+** HUGO
+   #+begin_src emacs-lisp
+
+(defun cesco/easy-hugo ()
+  (interactive)
+  (evil-define-key
+    (list 'normal 'insert 'visual 'motion)
+    easy-hugo-mode-map
+    "n" 'easy-hugo-newpost
+    "D" 'easy-hugo-article
+    "p" 'easy-hugo-preview
+    "P" 'easy-hugo-publish
+    "o" 'easy-hugo-open
+    "\C-m" 'easy-hugo-open
+    "d" 'easy-hugo-delete
+    "e" 'easy-hugo-open
+    "f" 'easy-hugo-open
+    "N" 'easy-hugo-no-help
+    "v" 'easy-hugo-view
+    "r" 'easy-hugo-refresh
+    "g" 'easy-hugo-refresh
+    "s" 'easy-hugo-sort-time
+    "S" 'easy-hugo-sort-char
+    "G" 'easy-hugo-github-deploy
+    "A" 'easy-hugo-amazon-s3-deploy
+    "C" 'easy-hugo-google-cloud-storage-deploy
+    "q" 'easy-hugo-quit
+    (kbd "RET") 'easy-hugo-open
+    (kbd "TAB") 'easy-hugo-preview)
+
+  (define-key global-map (kbd "C-c C-e") 'easy/hugo)
+  )
+
+
+(use-package easy-hugo
+:ensure t
+  :config
+  (setq easy-hugo-basedir "~/go/src/github.com/cescoferraro/iblog/"
+        easy-hugo-url "http://127.0.0.1:1313"
+        easy-hugo-sshdomain "blog"
+        easy-hugo-root "~/go/src/github.com/cescoferraro/iblog/"
+        easy-hugo-previewtime "30000")
+
+  (add-hook 'easy-hugo-mode-hook 'cesco/easy-hugo)
+
+)
+
+
+   #+end_src
+
+** DIRED+
+   #+begin_src emacs-lisp
+(defun my-dired-view-file ()
+  (interactive)
+  (dired-view-file)
+  (local-set-key (kbd "C-l") 'View-quit))
+
+(use-package dired
+  :ensure nil
+  :init
+  (let ((gls "/usr/local/bin/gls"))
+    (if (file-exists-p gls) (setq insert-directory-program gls)))
+  :config
+  (define-key dired-mode-map (kbd "C-l") 'my-dired-view-file)
+  (define-key dired-mode-map (kbd "C-u") 'dired-up-directory)
+  (setq dired-listing-switches "-aBhl  --group-directories-first ")
+  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+  (define-key dired-mode-map (kbd "TAB") 'dired-find-alternate-file)
+  (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file ".."))))
+
+(use-package all-the-icons-dired
+  :commands (all-the-icons-dired-mode)
+  :init
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+   #+end_src
+
 ** Zoom-window
    #+begin_src emacs-lisp
 (use-package zoom-window
@@ -469,11 +546,12 @@ narrowed."
 ** Helm
 
    #+BEGIN_SRC emacs-lisp
-     (use-package helm
-       :bind (
-   	   ("M-x" . helm-M-x)
-   	   ("C-x C-f" . helm-find-file)
-   	   ))
+(use-package helm
+  :ensure t
+  :bind (("M-x" . helm-M-x))
+  :config
+  (define-key global-map (kbd "C-x C-f") 'helm-find-files))
+
 (use-package helm-projectile
   :ensure t
   :config
@@ -1275,9 +1353,8 @@ narrowed."
 	      (eval flycheck-tslint-args)
 	      source-inplace)
     :error-parser flycheck-parse-tslint
-    :modes (typescript-mode web-mode))
+    :modes (web-mode))
   )
-
 (defun cesco/tslint ()
   (setq flycheck-tslint-args . (nil))
   (flycheck-select-checker 'typescript-tslint)
@@ -1297,7 +1374,7 @@ narrowed."
 (defun cesco/tide-mode ()
   (interactive)
   (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
-  (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver")
+  (setq tide-tsserver-executable "node_modules/.bin/tsserver")
   (tide-setup)
   (cesco/custom-tslint)
   (eldoc-mode +1)
@@ -1305,7 +1382,7 @@ narrowed."
   (add-hook 'before-save-hook 'tide-format-before-save)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (company-mode +1)
-;; (add-to-list 'company-backends '(company-tide :with company-yasnippet))
+  ;; (add-to-list 'company-backends '(company-tide :with company-yasnippet))
   (set (make-local-variable 'company-backends)
        '((company-tide company-files company-yasnippet))))
 
@@ -1514,6 +1591,19 @@ narrowed."
   ("p" cesco/automatic-push "Automatic push" :color blue )
   ("d" cesco/kill-other-buffers "kill all buffer" :color blue))
 (global-set-key[(shift control d)] 'cesco/hydra/body)
+
+   #+end_src
+
+
+
+** Help Hydra!
+   #+begin_src emacs-lisp
+(defhydra cesco/help-hydra ()
+  "cesco"
+  ("f" describe-function "defun" : color blue)
+  ("v" describe-variable "setq" : color blue)
+)
+(global-set-key[(shift control h)] 'cesco/help-hydra/body)
 
    #+end_src
 

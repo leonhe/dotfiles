@@ -19,6 +19,8 @@ enable_color_support() {
 
 }
 
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # [!] Don't break this function into smaller, more specialized ones
@@ -103,7 +105,7 @@ set_prompts() {
     Cyan="$(tput setaf 6)"
     Blue="$(tput setaf 1)"
     Magenta="$(tput setaf 5)"
-    Seco="$Cyan└─$Magenta $White⚡ $White "
+    Seco="$Cyan -$Magenta$White $ $White "
     export PS1='\[$Magenta\] \w\[$Blue\]$(__git_ps1)\n$Seco'
 
 

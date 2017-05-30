@@ -461,10 +461,10 @@ narrowed."
 (use-package easy-hugo
 :ensure t
   :config
-  (setq easy-hugo-basedir "~/go/src/github.com/cescoferraro/iblog/"
+  (setq easy-hugo-basedir "~/go/src/github.com/cescoferraro/me/"
         easy-hugo-url "http://127.0.0.1:1313"
         easy-hugo-sshdomain "blog"
-        easy-hugo-root "~/go/src/github.com/cescoferraro/iblog/"
+        easy-hugo-root "~/go/src/github.com/cescoferraro/me/"
         easy-hugo-previewtime "30000")
 
   (add-hook 'easy-hugo-mode-hook 'cesco/easy-hugo)

@@ -437,7 +437,6 @@ narrowed."
     "p" 'easy-hugo-preview
     "P" 'easy-hugo-publish
     "o" 'easy-hugo-open
-    "\C-m" 'easy-hugo-open
     "d" 'easy-hugo-delete
     "e" 'easy-hugo-open
     "f" 'easy-hugo-open
@@ -450,7 +449,7 @@ narrowed."
     "G" 'easy-hugo-github-deploy
     "A" 'easy-hugo-amazon-s3-deploy
     "C" 'easy-hugo-google-cloud-storage-deploy
-    "q" 'easy-hugo-quit
+    "q" 'evil-delete-buffer
     (kbd "RET") 'easy-hugo-open
     (kbd "TAB") 'easy-hugo-preview)
 
@@ -459,11 +458,13 @@ narrowed."
 
 
 (use-package easy-hugo
+:after (helm-ag)
 :ensure t
   :config
   (setq easy-hugo-basedir "~/go/src/github.com/cescoferraro/me/"
-        easy-hugo-url "http://127.0.0.1:1313"
-        easy-hugo-sshdomain "blog"
+  easy-hugo-postdir "content/blog"
+        easy-hugo-url "http://127.0.0.1:1313/me"
+        easy-hugo-sshdomain "me"
         easy-hugo-root "~/go/src/github.com/cescoferraro/me/"
         easy-hugo-previewtime "30000")
 
@@ -1580,9 +1581,18 @@ narrowed."
 ** Personal Hydra!
    #+begin_src emacs-lisp
 (defhydra cesco/hydra ()
-  "cesco"
+  "
+  ^Window^        ^Hugo^        ^Other^
+----------------------------------------------
+[_=_] Zoom IN   [_h_] Hugo-Posts [_g_] Edit lines
+[_-_] Zoom Out  [_H_] Hugo-Fixed [_p_] Mark all
+^ ^             [_a_] Unmark      [_p_] Mark by regexp
+^ ^             ^ ^              [_d_] Quit
+"
   ("=" text-scale-increase "in")
   ("-" text-scale-decrease "out")
+  ("h" (lambda () (interactive) (setq easy-hugo-postdir "content/blog") (easy-hugo))   "Posts" :color blue)
+  ("H" (lambda () (interactive) (setq easy-hugo-postdir "content/fixed") (easy-hugo))   "Fixed" :color blue)
   ("e" (lambda () (interactive)(find-file "~/.emacs.d/configuration.org")) "init.org"  :color blue)
   ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local"  :color blue)
   (";" cesco/insert-semicolon  "insert semicolon" :color blue)
@@ -1590,6 +1600,7 @@ narrowed."
   ("g" magit-list-repositories "Magit-List-Repos" :color blue)
   ("p" cesco/automatic-push "Automatic push" :color blue )
   ("d" cesco/kill-other-buffers "kill all buffer" :color blue))
+
 (global-set-key[(shift control d)] 'cesco/hydra/body)
 
    #+end_src

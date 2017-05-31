@@ -57,10 +57,14 @@ Version 2017-04-19"
 
 ** SLQ ORACLE
    #+begin_src emacs-lisp
+(defun cesco/sqlplus ()
+  (interactive)
+  (sqlplus "system/oracle@localhost:1521"))
+
 (setq sql-oracle-login-params
       '((user     :default "system")
         (password :default (password-read "Password:" "oracle"))
-        (database :default "localhost:49161/xe")))
+        (database :default "localhost:1521/xe")))
    #+end_src
 
 ** HideShow Folding
@@ -426,6 +430,17 @@ narrowed."
 
 ** HUGO
    #+begin_src emacs-lisp
+(defun cesco/easy-hugo-preview ()
+  "Preview hugo at localhost."
+  (interactive)
+  (easy-hugo-with-env
+   (if (process-live-p easy-hugo--server-process)
+       (browse-url easy-hugo-url)
+     (progn
+       (setq easy-hugo--server-process
+	     (start-process "hugo-server" easy-hugo--preview-buffer "hugo" "server"))
+       (browse-url easy-hugo-url)
+       (run-at-time easy-hugo-previewtime nil 'easy-hugo--preview-end)))))
 
 (defun cesco/easy-hugo ()
   (interactive)
@@ -450,27 +465,24 @@ narrowed."
     "A" 'easy-hugo-amazon-s3-deploy
     "C" 'easy-hugo-google-cloud-storage-deploy
     "q" 'evil-delete-buffer
-    (kbd "RET") 'easy-hugo-open
-    (kbd "TAB") 'easy-hugo-preview)
+    (kbd "TAB") 'easy-hugo-open
+    (kbd "RET") 'easy-hugo-preview)
 
   (define-key global-map (kbd "C-c C-e") 'easy/hugo)
   )
 
 
 (use-package easy-hugo
-:after (helm-ag)
-:ensure t
+  :after (helm-ag)
+  :ensure t
   :config
   (setq easy-hugo-basedir "~/go/src/github.com/cescoferraro/me/"
-  easy-hugo-postdir "content/blog"
+	easy-hugo-postdir "content/blog"
         easy-hugo-url "http://127.0.0.1:1313/me"
         easy-hugo-sshdomain "me"
         easy-hugo-root "~/go/src/github.com/cescoferraro/me/"
         easy-hugo-previewtime "30000")
-
-  (add-hook 'easy-hugo-mode-hook 'cesco/easy-hugo)
-
-)
+  (add-hook 'easy-hugo-mode-hook 'cesco/easy-hugo))
 
 
    #+end_src
@@ -491,6 +503,8 @@ narrowed."
   (define-key dired-mode-map (kbd "C-l") 'my-dired-view-file)
   (define-key dired-mode-map (kbd "C-u") 'dired-up-directory)
   (setq dired-listing-switches "-aBhl  --group-directories-first ")
+  (define-key dired-mode-map (kbd "H") 'tabbar-backward)
+  (define-key dired-mode-map (kbd "L") 'tabbar-forward)
   (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
   (define-key dired-mode-map (kbd "TAB") 'dired-find-alternate-file)
   (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file ".."))))
@@ -568,15 +582,17 @@ narrowed."
 
    #+END_SRC
 
-** Rainbox
+** Rainbow
    #+BEGIN_SRC emacs-lisp
-(use-package rainbow-delimiters
-	  :ensure t)
 (use-package rainbow-mode
   :ensure t
   :diminish rainbow-mode
   :config
   (add-hook 'prog-mode-hook 'rainbow-mode))
+(use-package rainbow-delimiters
+	  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
    #+END_SRC
 
 ** Openwith
@@ -645,6 +661,7 @@ narrowed."
   :config
   (global-flycheck-mode)
   (flycheck-add-mode 'typescript-tslint 'web-mode)
+  (flycheck-add-mode 'typescript-tslint-cesco 'web-mode)
   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
   (setq flycheck-display-errors-delay 0)
   (set-face-attribute 'flycheck-error nil :background "#8c5353")
@@ -1582,13 +1599,13 @@ narrowed."
    #+begin_src emacs-lisp
 (defhydra cesco/hydra ()
   "
-  ^Window^        ^Hugo^        ^Other^
-----------------------------------------------
-[_=_] Zoom IN   [_h_] Hugo-Posts [_g_] Edit lines
-[_-_] Zoom Out  [_H_] Hugo-Fixed [_p_] Mark all
-^ ^             [_a_] Unmark      [_p_] Mark by regexp
-^ ^             ^ ^              [_d_] Quit
+  ^Window^        ^Hugo^            ^GIT^           ^Others^
+----------------------------------------------------------------------------------------
+[_=_] Zoom IN   [_h_] Posts     [_p_] Auto-PUSH    [_d_] Kill all Buffers
+[_-_] Zoom Out  [_H_] Tabs      [_g_] Repo's List  [_p_] Mark all
+^ ^             [_C-p_] Preview [_g_] Edit lines   [_p_] Mark by regexp
 "
+  ("C-p" easy-hugo-preview "in" :color blue)
   ("=" text-scale-increase "in")
   ("-" text-scale-decrease "out")
   ("h" (lambda () (interactive) (setq easy-hugo-postdir "content/blog") (easy-hugo))   "Posts" :color blue)

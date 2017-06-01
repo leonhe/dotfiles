@@ -14,6 +14,11 @@ My Emacs Configuration! Enjoy
   #+END_SRC
 * Setup
 
+** Auto revert mode
+   #+begin_src emacs-lisp
+(global-auto-revert-mode 1)
+   #+end_src
+
 ** shell
    #+begin_src emacs-lisp
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
@@ -184,58 +189,101 @@ Version 2017-04-19"
 ** tabbar
 
    #+BEGIN_SRC emacs-lisp
+(defun cesco/tabbar-faces ()
+ (set-face-attribute
+  'tabbar-default nil
+  :background "gray20"
+  :foreground "gray20"
+  :box '(:line-width 1 :color "gray20" :style nil))
+ (set-face-attribute
+  'tabbar-unselected nil
+  :background "gray30"
+  :foreground "white"
+  :box '(:line-width 5 :color "gray30" :style nil))
+ (set-face-attribute
+  'tabbar-selected nil
+  :background "gray75"
+  :foreground "black"
+  :box '(:line-width 5 :color "gray75" :style nil))
+ (set-face-attribute
+  'tabbar-highlight nil
+  :background "white"
+  :foreground "black"
+  :underline nil
+  :box '(:line-width 5 :color "white" :style nil))
+ (set-face-attribute
+  'tabbar-button nil
+  :box '(:line-width 1 :color "gray20" :style nil))
+ (set-face-attribute
+  'tabbar-separator nil
+  :background "gray20"
+  :height 0.6)
+ )
+
+;; adding spaces
+(defun tabbar-buffer-tab-label (tab)
+  "Return a label for TAB.
+That is, a string used to represent it on the tab bar."
+  (let ((label  (if tabbar--buffer-show-groups
+                    (format "[%s]  " (tabbar-tab-tabset tab))
+                  (format "%s  " (tabbar-tab-value tab)))))
+    ;; Unless the tab bar auto scrolls to keep the selected tab
+    ;; visible, shorten the tab label to keep as many tabs as possible
+    ;; in the visible area of the tab bar.
+    (if tabbar-auto-scroll-flag
+        label
+      (tabbar-shorten
+       label (max 1 (/ (window-width)
+                       (length (tabbar-view
+                                (tabbar-current-tabset)))))))))
+
+(defun my-tabbar-buffer-groups-by-project ()
+  (list
+   (cond
+    ((memq major-mode '(mu4e-view-mode
+			mu4e-main-mode
+			mu4e-headers-mode
+			mu4e-view-raw-mode
+			twittering-mode weibo-timeline-mode
+			jabber-roster-mode jabber-chat-mode erc-mode douban-music-mode
+			)) "Activity")
+    ((memq major-mode '(eshell-mode term-mode shell-mode))
+     (if (projectile-project-p) (projectile-project-name) "Common")
+     )
+    ((string-equal "*" (substring (buffer-name) 0 1))
+     "Emacs"
+     )
+    ((memq major-mode '(fundamental-mode))
+     "Emacs"
+     )
+    (t
+     (if (projectile-project-p) (projectile-project-name) "Common")
+     )
+    )))
+
+
+(defun my-tabbar-buffer-groups-by-all ()
+  (list
+   (cond
+    ((string-equal "*" (substring (buffer-name) 0 1))
+     "Emacs"
+     )
+    (t "All"))))
+
 (use-package tabbar
   :after evil
   :init
+  :config
+  (cesco/tabbar-faces)
+  (setq tabbar-background-color "#696969")
   (setq tabbar-cycle-scope 'tabs)
   (setq tabbar-background-color nil)
   (setq tabbar-separator (quote (1.0)))
   (setq tool-bar-mode nil)
-  :config
-  (setq tabbar-background-color "#393939")
-  (custom-set-faces
-   '(tabbar-default ((t (:inherit variable-pitch :height 1.4 :background "#393939" :foreground "black" :weight bold))))
-   '(tabbar-button ((t (:inherit tabbar-default :foreground "#f2f0ec"))))
-   '(tabbar-button-highlight ((t (:inherit tabbar-default))))
-   '(tabbar-highlight ((t (:underline t))))
-   '(tabbar-selected ((t (:inherit tabbar-default :background "#393939" :foreground "#ffcc66"))))
-   '(tabbar-separator ((t (:inherit tabbar-default :background "#393939"))))
-   '(tabbar-unselected ((t (:inherit tabbar-default)))))
   (global-set-key (kbd "s-{") 'tabbar-backward-group)
   (global-set-key (kbd "s-}") 'tabbar-forward-group)
   (global-set-key (kbd "s-[") 'tabbar-backward)
   (global-set-key (kbd "s-]") 'tabbar-forward)
-  (defun my-tabbar-buffer-groups-by-project ()
-    (list
-     (cond
-      ((memq major-mode '(mu4e-view-mode mu4e-main-mode mu4e-headers-mode mu4e-view-raw-mode
-					 twittering-mode weibo-timeline-mode
-					 jabber-roster-mode jabber-chat-mode erc-mode douban-music-mode
-					 ))
-       "Activity"
-       )
-      ((memq major-mode '(eshell-mode term-mode shell-mode))
-       (if (projectile-project-p) (projectile-project-name) "Common")
-       )
-      ((string-equal "*" (substring (buffer-name) 0 1))
-       "Emacs"
-       )
-      ((memq major-mode '(fundamental-mode))
-       "Emacs"
-       )
-      (t
-       (if (projectile-project-p) (projectile-project-name) "Common")
-       )
-      )))
-
-  (defun my-tabbar-buffer-groups-by-all ()
-    (list
-     (cond
-      ((string-equal "*" (substring (buffer-name) 0 1))
-       "Emacs"
-       )
-      (t "All"))))
-
   (setq tabbar-buffer-groups-function 'my-tabbar-buffer-groups-by-project)
   (tabbar-mode 1))
    #+END_SRC
@@ -661,7 +709,6 @@ narrowed."
   :config
   (global-flycheck-mode)
   (flycheck-add-mode 'typescript-tslint 'web-mode)
-  (flycheck-add-mode 'typescript-tslint-cesco 'web-mode)
   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
   (setq flycheck-display-errors-delay 0)
   (set-face-attribute 'flycheck-error nil :background "#8c5353")
@@ -1372,6 +1419,8 @@ narrowed."
 	      source-inplace)
     :error-parser flycheck-parse-tslint
     :modes (web-mode))
+
+  ;; (flycheck-add-mode 'typescript-tslint-cesco 'web-mode)
   )
 (defun cesco/tslint ()
   (setq flycheck-tslint-args . (nil))
@@ -1382,13 +1431,16 @@ narrowed."
   (if (projectile-project-p)
       (if (file-exists-p (concat ( projectile-project-root ) "tsconfig.json"))
 	  (progn
-	    (setq flycheck-tslint-args . ("--type-check"))
+	    ;; (setq flycheck-tslint-args . ("--type-check"))
 	    (setq flycheck-typescript-tsconfig . ( (concat projectile-project-root "tsconfig.json" )))
 	    (flycheck-select-checker 'typescript-tslint-cesco))
         (cesco/tslint)
 	)))
 
-
+(add-hook 'json-mode-hook
+          (lambda ()
+            (make-local-variable 'js-indent-level)
+            (setq js-indent-level 2)))
 (defun cesco/tide-mode ()
   (interactive)
   (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
@@ -1480,6 +1532,7 @@ narrowed."
     "w" 'delete-window
     "e" 'kill-this-buffer
     "," 'previous-buffer
+    "r" 'helm-recentf
     ";" 'projectile-run-eshell
     "E" 'org-export-dispatch
     "i" 'cesco/indent
@@ -1599,11 +1652,11 @@ narrowed."
    #+begin_src emacs-lisp
 (defhydra cesco/hydra ()
   "
-  ^Window^        ^Hugo^            ^GIT^           ^Others^
+  ^Window^        ^Hugo^            ^SEARCH^             ^GIT^              ^Others^
 ----------------------------------------------------------------------------------------
-[_=_] Zoom IN   [_h_] Posts     [_p_] Auto-PUSH    [_d_] Kill all Buffers
-[_-_] Zoom Out  [_H_] Tabs      [_g_] Repo's List  [_p_] Mark all
-^ ^             [_C-p_] Preview [_g_] Edit lines   [_p_] Mark by regexp
+[_=_] Zoom IN   [_h_] Posts      [_p_] Auto-PUSH   [_p_] Auto-PUSH    [_d_] Kill all Buffers
+[_-_] Zoom Out  [_H_] Tabs       [_p_] Auto-PUSH   [_g_] Repo's List  [_p_] Mark all
+^ ^             [_C-p_] Preview  [_p_] Auto-PUSH
 "
   ("C-p" easy-hugo-preview "in" :color blue)
   ("=" text-scale-increase "in")

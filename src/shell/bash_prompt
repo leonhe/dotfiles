@@ -87,7 +87,7 @@ get_git_repository_details() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        branchName="$( printf "%s" "$( git rev-parse --abbrev-ref HEAD 2> /dev/null \
+    branchName="$( printf "%s" "$( git rev-parse --abbrev-ref HEAD 2> /dev/null \
         || git rev-parse --short HEAD 2> /dev/null \
         || printf " (unknown)" )" | tr -d "\n" )"
 
@@ -101,14 +101,18 @@ get_git_repository_details() {
 
 set_prompts() {
 
-    White="$(tput setaf 7)"
-    Cyan="$(tput setaf 6)"
-    Blue="$(tput setaf 1)"
-    Magenta="$(tput setaf 5)"
-    Seco="$Cyan -$Magenta$White $ $White "
-    export PS1='\[$Magenta\] \w\[$Blue\]$(__git_ps1)\n$Seco'
+    # White="$(tput setaf 7)"
+    # Cyan="$(tput setaf 6)"
+    # Blue="$(tput setaf 1)"
+    # Magenta="$(tput setaf 5)"
+    # Seco="$Cyan -$Magenta$White $ $White "
+    # export PS1='\[$Magenta\] \w\[$Blue\]$(__git_ps1)\n$Seco'
 
-
+    if [[ ${EUID} == 0 ]] ; then
+        PS1='\[\033[01m\][ \[\033[01;31m\]\u@\h \[\033[00m\]\[\033[01m\]] \[\033[01;32m\]\w\[\033[00m\]\n\[\033[01;31m\]$\[\033[00m\] '
+    else
+        PS1='\[\033[01m\][ \[\033[01;34m\]\u@\h \[\033[00m\]\[\033[01m\]] \[\033[01;32m\]\w\[\033[00m\]\n\[\033[01;34m\]$\[\033[00m\] '
+    fi
 
 
     PS2="⚡ "

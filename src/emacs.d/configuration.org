@@ -464,9 +464,7 @@ narrowed."
     "q" 'evil-delete-buffer
     (kbd "TAB") 'easy-hugo-open
     (kbd "RET") 'easy-hugo-preview)
-
-  (define-key global-map (kbd "C-c C-e") 'easy/hugo)
-  )
+  (define-key global-map (kbd "C-c C-e") 'easy/hugo))
 
 
 (use-package easy-hugo
@@ -476,11 +474,11 @@ narrowed."
   (setq easy-hugo-basedir "~/go/src/github.com/cescoferraro/me/"
 	easy-hugo-postdir "content/blog"
         easy-hugo-url "http://127.0.0.1:1313/me"
+        easy-hugo-preview-url "http://127.0.0.1:1313/me"
         easy-hugo-sshdomain "me"
         easy-hugo-root "~/go/src/github.com/cescoferraro/me/"
-        easy-hugo-previewtime "30000")
+        easy-hugo-previewtime "500")
   (add-hook 'easy-hugo-mode-hook 'cesco/easy-hugo))
-
 
    #+end_src
 
@@ -1566,30 +1564,44 @@ That is, a string used to represent it on the tab bar."
    #+END_SRC
 
 * Evil
-** Evil Paraphernalia
+** Nerd Commenter
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
 (use-package evil-nerd-commenter
-  :ensure t
+  :after evil
   :config (progn
 	    (evilnc-default-hotkeys)))
+   #+end_src
 
+** Smartparens
+
+   #+begin_src emacs-lisp
 (use-package
   evil-smartparens
   :diminish evil-smartparens-mode
-  :ensure t
+  :after evil
   :init (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode))
+   #+end_src
+
+** Org
+   #+begin_src emacs-lisp
 (use-package evil-org
   :diminish evil-org-mode
+  :after evil
   :ensure t)
+   #+end_src
+
+** Surround
+
+   #+BEGIN_SRC emacs-lisp
 (use-package evil-surround
-  :ensure t
+  :after evil
   :config
   (global-evil-surround-mode))
-
    #+END_SRC
 
-** Evil-Leader
+** Leader
+
    #+BEGIN_SRC emacs-lisp
 
 (defun cesco/config-evil-leader ()
@@ -1622,10 +1634,7 @@ That is, a string used to represent it on the tab bar."
   (global-evil-leader-mode)
   )
 
-(use-package evil-leader
-  :ensure helm
-  :ensure neotree
-  :config (cesco/config-evil-leader))
+(use-package evil-leader :ensure helm :ensure neotree :config (cesco/config-evil-leader))
    #+END_SRC
 
 ** Evil itself
@@ -1635,27 +1644,21 @@ That is, a string used to represent it on the tab bar."
   :after evil-leader
   :ensure t
   :config
-
-
   (set-default 'evil-symbol-word-search t)
-
-
   (define-key evil-normal-state-map "L" 'tabbar-forward-tab)
   (define-key evil-normal-state-map "H" 'tabbar-backward-tab)
-
-(evil-define-key 'normal evil-org-mode-map
-  "H" 'tabbar-backward-tab
-  "L" 'tabbar-forward-tab)
-
+  (evil-define-key 'normal evil-org-mode-map
+    "H" 'tabbar-backward-tab
+    "L" 'tabbar-forward-tab)
   (evil-mode)
   )
    #+END_SRC
 
 * Hydras
 
-   #+begin_src emacs-lisp
+  #+begin_src emacs-lisp
 (use-package hydra :ensure t)
-   #+end_src
+  #+end_src
 
 ** Personal Hydra!
    #+begin_src emacs-lisp
@@ -1723,4 +1726,4 @@ That is, a string used to represent it on the tab bar."
 (global-set-key[(shift control s)] 'multiple-cursors-hydra/body)
    #+end_src
 
-*10.000 HOURS*
+   *10.000 HOURS*

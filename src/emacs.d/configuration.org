@@ -344,36 +344,72 @@ narrowed."
 * Org
 
   #+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :after org
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode t))))
 
+(use-package ox-reveal
+  :ensure t
+  :after org
+  :config
+  (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+  (setq org-reveal-mathjax t)
+  )
+
+(use-package ox-latex
+  :ensure t
+  :after org
+  )
+
+(use-package htmlize
+  :after org
+  :ensure t)
+
+
+
+(defun cesco/flyispell-org ()
+  (setq ispell-dictionary "pt_BR")
+
+  ;; NO spell check for embedded snippets
+  (defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
+    (let ((rlt ad-return-value)
+	  (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\)")
+	  (end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\)")
+	  old-flag
+	  b e)
+      (when ad-return-value
+	(save-excursion
+	  (setq old-flag case-fold-search)
+	  (setq case-fold-search t)
+	  (setq b (re-search-backward begin-regexp nil t))
+	  (if b (setq e (re-search-forward end-regexp nil t)))
+	  (setq case-fold-search old-flag))
+	(if (and b e (< (point) e)) (setq rlt nil)))
+      (setq ad-return-value rlt)))
+
+  (defun my/flyspell-hack ()
+    (flyspell-mode 1)
+    (flyspell-mode -1))
+
+  (add-hook 'org-mode-hook 'my/flyspell-hack)
+
+
+
+  )
 
 
 
 
 (use-package org
+  :after flyspell
   :ensure t
   :config
-
-  (require 'ox-latex)
-  (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode t))))
-
-  (use-package ox-reveal
-    :ensure ox-reveal)
-
-  (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
-  (setq org-reveal-mathjax t)
-
-  (use-package htmlize
-    :ensure t)
-
-
-
   (add-hook 'org-mode-hook #'visual-line-mode)
   (diminish 'visual-line-mode)
-  (setq org-src-fontify-natively t)
   ;; (setq org-support-shift-select t)
+  (setq org-src-fontify-natively t)
   (setq org-src-preserve-indentation t)
   (setq org-confirm-babel-evaluate nil)
   (org-babel-do-load-languages
@@ -382,33 +418,8 @@ narrowed."
      (python . t)
      (go . t)
      (java . t)
-     (lisp . t)))
+     (lisp . t))))
 
-;; NO spell check for embedded snippets
-(defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
- (let ((rlt ad-return-value)
-  (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\)")
-  (end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\)")
-  old-flag
-  b e)
-    (when ad-return-value
- (save-excursion
-   (setq old-flag case-fold-search)
-   (setq case-fold-search t)
-   (setq b (re-search-backward begin-regexp nil t))
-  (if b (setq e (re-search-forward end-regexp nil t)))
-        (setq case-fold-search old-flag))
-      (if (and b e (< (point) e)) (setq rlt nil)))
-    (setq ad-return-value rlt)))
-
-(defun my/flyspell-hack ()
-  (flyspell-mode 1)
-  (flyspell-mode -1))
-
-(add-hook 'org-mode-hook 'my/flyspell-hack)
-  )
-
-(setq ispell-dictionary "pt_BR")
   #+END_SRC
 
 * Packages
@@ -1641,77 +1652,9 @@ That is, a string used to represent it on the tab bar."
    #+END_SRC
 
 * Hydras
-** Hydra Itself!
+
    #+begin_src emacs-lisp
-
-
-   (use-package hydra
-  :preface
-  (require 'hydra-examples)
-  (use-package windmove
-    :ensure nil)
-  (use-package winner
-    :ensure nil
-    :config
-    (winner-mode 1))
-  (use-package windresize)
-  (use-package ace-window
-    :bind ("M-o" . shackra/other-window)
-    :init
-    (custom-set-faces
-     '(aw-leading-char-face
-       ((t (:inherit ace-jump-face-foreground :height 3.0)))))
-    (defun --count-frames ()
-      "Retorna el numero de frames visibles"
-      (let* ((frames (if (daemonp) (butlast (visible-frame-list) 1) (visible-frame-list))))
-        (length frames)))
-    (defun shackra/other-window ()
-      "cambia la ventana en que el cursor esta"
-      (interactive)
-      (ace-window 0)
-      (when golden-ratio-mode
-        (golden-ratio)))
-    :config
-    (setf aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
-  :config
-  (defhydra hydra-zoom (global-map "<f2>")
-    "Acercamiento"
-    ("f" text-scale-increase "in")
-    ("j" text-scale-decrease "out"))
-  (defhydra hydra-avy (:color blue :columns 2)
-    "avy jump"
-    ("z" avy-goto-line "Ir a la linea...")
-    ("x" avy-goto-word-1 "Ir a la palabra...")
-    ("c" avy-goto-char-in-line "Ir a la letra en la linea actual...")
-    ("v" avy-goto-char "Ir a la palabra (2)..."))
-  (bind-key "C-z" 'hydra-avy/body)
-  ;; Hydra nos permite hacer magia con la administración de ventanas dentro de
-  ;; un marco de Emacs. Varios paquetes estan especificados en el `:preface'
-  ;; del macro para hydra
-  (defhydra hydra-win (:columns 4 :color amaranth :pre (progn (golden-ratio-mode -1) (balance-windows)) :post (progn (golden-ratio-mode 1) (golden-ratio-adjust golden-ratio-adjust-factor)))
-    "Manejo de ventanas"
-    ("<up>" windmove-up "Cursor ↑")
-    ("<left>" windmove-left "Cursor ←")
-    ("<down>" windmove-down "Cursor ↓")
-    ("<right>" windmove-right "Cursor →")
-    ("C-<up>" hydra-move-splitter-up "Astilla ↑")
-    ("C-<left>" hydra-move-splitter-left "Astilla ←")
-    ("C-<down>" hydra-move-splitter-down "Astilla ↓")
-    ("C-<right>" hydra-move-splitter-right "Astilla →")
-    ("b" shackra/switch-buffer "Cambiar buffer")
-    ("f" shackra/find-file "Visitar/Crear archivo")
-    ("z" (lambda () (interactive) (ace-window 1) (add-hook 'ace-window-end-once-hook 'hydra-win/body)) "Mover cursor a otra ventana")
-    ("2" (lambda () (interactive) (split-window-right) (windmove-right)) "Dividir |")
-    ("3" (lambda () (interactive) (split-window-below) (windmove-down)) "Dividir -")
-    ("c" (lambda () (interactive) (ace-window 4) (add-hook 'ace-window-end-once-hook 'hydra-win/body)) "Intercambiar buffer de ventana")
-    ("s" save-buffer "Guardar buffer")
-    ("x" delete-window "Borrar ventana")
-    ("X" (lambda () (interactive) (ace-window 16) (add-hook 'ace-window-end-once-hook 'hydra-win/body)) "Borrar esta/otra ventana")
-    ("1" ace-maximize-window "Maximizar esta ventana")
-    ("," (progn (winner-undo) (setf this-command 'winner-undo)) "Deshacer ultimo cambio")
-    ("." winner-redo "Rehacer ultimo cambio")
-    ("SPC" nil "Salir"))
-  (bind-key "M-1" #'hydra-win/body))
+(use-package hydra :ensure t)
    #+end_src
 
 ** Personal Hydra!
@@ -1743,8 +1686,8 @@ That is, a string used to represent it on the tab bar."
 
    #+end_src
 
-
 ** Help Hydra!
+
    #+begin_src emacs-lisp
 (defhydra cesco/help-hydra ()
   "cesco"
@@ -1780,4 +1723,4 @@ That is, a string used to represent it on the tab bar."
 (global-set-key[(shift control s)] 'multiple-cursors-hydra/body)
    #+end_src
 
-   iasd
+*10.000 HOURS*

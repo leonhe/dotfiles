@@ -693,7 +693,7 @@ narrowed."
   (interactive)
   (--if-let (tabulated-list-get-id)
       (progn
-	(find-file (get-random-element (delete ".." (delete "." (directory-files-recursive (expand-file-name it) "\\*" 2 "\\(node_modules\\|git/\\)") ) ) ) )
+	(find-file (expand-file-name it) )
 	)
     (user-error "There is no repository at point")
     ) )

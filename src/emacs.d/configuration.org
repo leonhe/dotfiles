@@ -344,71 +344,41 @@ narrowed."
 * Org
 
   #+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :after org
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode t))))
-
-(use-package ox-reveal
-  :ensure t
-  :after org
-  :config
-  (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
-  (setq org-reveal-mathjax t)
-  )
-
-(use-package ox-latex
-  :ensure t
-  :after org
-  )
-
-(use-package htmlize
-  :after org
-  :ensure t)
+;; NO spell check for embedded snippets
+(defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
+  (let ((rlt ad-return-value)
+	(begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\)")
+	(end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\)")
+	old-flag
+	b e)
+    (when ad-return-value
+      (save-excursion
+	(setq old-flag case-fold-search)
+	(setq case-fold-search t)
+	(setq b (re-search-backward begin-regexp nil t))
+	(if b (setq e (re-search-forward end-regexp nil t)))
+	(setq case-fold-search old-flag))
+      (if (and b e (< (point) e)) (setq rlt nil)))
+    (setq ad-return-value rlt)))
 
 
-
-(defun cesco/flyispell-org ()
-  (setq ispell-dictionary "pt_BR")
-
-  ;; NO spell check for embedded snippets
-  (defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
-    (let ((rlt ad-return-value)
-	  (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\)")
-	  (end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\)")
-	  old-flag
-	  b e)
-      (when ad-return-value
-	(save-excursion
-	  (setq old-flag case-fold-search)
-	  (setq case-fold-search t)
-	  (setq b (re-search-backward begin-regexp nil t))
-	  (if b (setq e (re-search-forward end-regexp nil t)))
-	  (setq case-fold-search old-flag))
-	(if (and b e (< (point) e)) (setq rlt nil)))
-      (setq ad-return-value rlt)))
-
-  (defun my/flyspell-hack ()
-    (flyspell-mode 1)
-    (flyspell-mode -1))
-
-  (add-hook 'org-mode-hook 'my/flyspell-hack)
-
-
-
-  )
-
-
-
+(defun my/flyspell-hack ()
+  (flyspell-mode 1)
+  (flyspell-mode -1))
 
 (use-package org
-  :after flyspell
-  :ensure t
+  :after (flyspell)
+  :defer t
   :config
-  (add-hook 'org-mode-hook #'visual-line-mode)
+  (require 'ox-latex)
+  (require 'htmlize)
+  (require 'org-bullets)
+  (require 'ox-reveal)
+  (setq ispell-dictionary "pt_BR")
+  (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
   (diminish 'visual-line-mode)
-  ;; (setq org-support-shift-select t)
+  (setq org-reveal-mathjax t)
+  (setq org-support-shift-select t)
   (setq org-src-fontify-natively t)
   (setq org-src-preserve-indentation t)
   (setq org-confirm-babel-evaluate nil)
@@ -418,7 +388,13 @@ narrowed."
      (python . t)
      (go . t)
      (java . t)
-     (lisp . t))))
+     (lisp . t)))
+
+  (add-hook 'org-mode-hook 'my/flyspell-hack)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode t)))
+  (add-hook 'org-mode-hook #'visual-line-mode)
+
+)
 
   #+END_SRC
 
@@ -427,18 +403,6 @@ narrowed."
 
 ** HUGO
    #+begin_src emacs-lisp
-(defun cesco/easy-hugo-preview ()
-  "Preview hugo at localhost."
-  (interactive)
-  (easy-hugo-with-env
-   (if (process-live-p easy-hugo--server-process)
-       (browse-url easy-hugo-url)
-     (progn
-       (setq easy-hugo--server-process
-	     (start-process "hugo-server" easy-hugo--preview-buffer "hugo" "server"))
-       (browse-url easy-hugo-url)
-       (run-at-time easy-hugo-previewtime nil 'easy-hugo--preview-end)))))
-
 (defun cesco/easy-hugo ()
   (interactive)
   (evil-define-key
@@ -451,6 +415,7 @@ narrowed."
     "o" 'easy-hugo-open
     "d" 'easy-hugo-delete
     "e" 'easy-hugo-open
+    "c" 'easy-hugo-open-config
     "f" 'easy-hugo-open
     "N" 'easy-hugo-no-help
     "v" 'easy-hugo-view
@@ -1500,7 +1465,6 @@ That is, a string used to represent it on the tab bar."
   (setq flycheck-tslint-args . (nil))
   (flycheck-select-checker 'typescript-tslint)
   )
-
 (defun cesco/custom-tslint ()
   (if (projectile-project-p)
       (if (file-exists-p (concat ( projectile-project-root ) "tsconfig.json"))
@@ -1600,12 +1564,29 @@ That is, a string used to represent it on the tab bar."
   (global-evil-surround-mode))
    #+END_SRC
 
-** Leader
+** Evil itself
+
+   #+BEGIN_SRC emacs-lisp
+(use-package evil
+  :after evil-leader
+  :ensure t
+  :config
+  (set-default 'evil-symbol-word-search t)
+  (define-key evil-normal-state-map "L" 'tabbar-forward-tab)
+  (define-key evil-normal-state-map "H" 'tabbar-backward-tab)
+  (evil-define-key 'normal evil-org-mode-map
+    "H" 'tabbar-backward-tab
+    "L" 'tabbar-forward-tab)
+  (evil-mode)
+  )
+   #+END_SRC
+
+** Leader Key
 
    #+BEGIN_SRC emacs-lisp
 
 (defun cesco/config-evil-leader ()
-  (evil-leader/set-leader ",")
+  (evil-leader/set-leader "SPC")
   (evil-leader/set-key
     "/" 'evilnc-comment-or-uncomment-lines
     "ci" 'evilnc-comment-or-uncomment-lines
@@ -1623,35 +1604,21 @@ That is, a string used to represent it on the tab bar."
     "w" 'delete-window
     "e" 'kill-this-buffer
     "," 'previous-buffer
+    "a" 'helm-projectile-ag
     "r" 'helm-recentf
+    "SPC" 'helm-M-x
     ";" 'projectile-run-eshell
     "E" 'org-export-dispatch
     "i" 'cesco/indent
     "TAB" 'org-cycle
     "p" 'projectile-switch-project
     (kbd ".") (lambda () (interactive)(golden-ratio)(ace-window ""))
+    (kbd "n") (lambda () (interactive)(golden-ratio)(ace-window ""))
     (kbd "o") (lambda () (interactive) (find-file "~/.emacs.d/configuration.org")))
   (global-evil-leader-mode)
   )
 
-(use-package evil-leader :ensure helm :ensure neotree :config (cesco/config-evil-leader))
-   #+END_SRC
-
-** Evil itself
-
-   #+BEGIN_SRC emacs-lisp
-(use-package evil
-  :after evil-leader
-  :ensure t
-  :config
-  (set-default 'evil-symbol-word-search t)
-  (define-key evil-normal-state-map "L" 'tabbar-forward-tab)
-  (define-key evil-normal-state-map "H" 'tabbar-backward-tab)
-  (evil-define-key 'normal evil-org-mode-map
-    "H" 'tabbar-backward-tab
-    "L" 'tabbar-forward-tab)
-  (evil-mode)
-  )
+(use-package evil-leader :ensure t :config (cesco/config-evil-leader))
    #+END_SRC
 
 * Hydras

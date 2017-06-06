@@ -52,3 +52,6 @@ let g:tern_map_keys=1
 
 " CrossHair
 set cursorline    " enable the horizontal line
+
+" Fix Python Path (for YCM)
+let g:ycm_path_to_python_interpreter="/usr/bin/python"

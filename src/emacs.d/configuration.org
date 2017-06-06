@@ -399,8 +399,6 @@ narrowed."
   #+END_SRC
 
 * Packages
-
-
 ** HUGO
    #+begin_src emacs-lisp
 (defun cesco/easy-hugo ()
@@ -1358,11 +1356,21 @@ That is, a string used to represent it on the tab bar."
                             (setq c-basic-offset 4
                                   tab-width 4
                                   indent-tabs-mode t)))
+
+
+(defun cesco/eclim-evil ()
+  (evil-leader/set-key-for-mode 'eclim-mode
+    "j" (lambda () (interactive)(eclim-java-find-declaration))
+    )
+  )
+
 (use-package eclim
   :ensure t
+  :after evil-leader
   :if (string-match-p (regexp-quote "cesco") user-login-name)
   :config (progn
 	    ;; (setq eclimd-autostart t)
+	    (cesco/eclim-evil)
 	    (cond
 	     ((string-equal system-type "gnu/linux")
 	      (setq eclim-executable "/opt/eclipse/eclim")

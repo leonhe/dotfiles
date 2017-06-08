@@ -18,9 +18,9 @@
         # Improve the output for decimal numbers.
 
         printf "%s" "$result" |
-        sed -e "s/^\./0./"          # Add "0" for cases like ".5".` \
-            -e "s/^-\./-0./"        # Add "0" for cases like "-.5".`\
-            -e "s/0*$//;s/\.$//"    # Remove tailing zeros.
+            sed -e "s/^\./0./"          # Add "0" for cases like ".5".` \
+                -e "s/^-\./-0./"        # Add "0" for cases like "-.5".`\
+                -e "s/0*$//;s/\.$//"    # Remove tailing zeros.
 
     else
         printf "%s" "$result"
@@ -47,8 +47,8 @@ datauri() {
         fi
 
         printf "data:%s;base64,%s" \
-                    "$mimeType" \
-                    "$(openssl base64 -in "$1" | tr -d "\n")"
+               "$mimeType" \
+               "$(openssl base64 -in "$1" | tr -d "\n")"
     else
         printf "%s is not a file.\n" "$1"
     fi
@@ -84,11 +84,11 @@ gz() {
 
             printf " ─────────────────────────────\n"
             printf " reduction:       %12s [%s%%]\n\n" \
-                        "$( hrfs $((originalSize - gzippedSize)) )" \
-                        "$( printf "%s %s" "$originalSize $gzippedSize" | \
+                   "$( hrfs $((originalSize - gzippedSize)) )" \
+                   "$( printf "%s %s" "$originalSize $gzippedSize" | \
                             awk '{ printf "%.1f", 100 - $2 * 100 / $1 }' | \
                             sed -e "s/0*$//;s/\.$//" )"
-                            #              └─ remove tailing zeros
+            #              └─ remove tailing zeros
 
         else
             printf "\"%s\" is empty.\n" "$1"
@@ -107,7 +107,7 @@ gz() {
 hrfs() {
 
     printf "%s" "$1" |
-    awk '{
+        awk '{
             i = 1;
             split("B KB MB GB TB PB EB ZB YB WTFB", v);
             value = $1;
@@ -128,8 +128,8 @@ hrfs() {
 
             }
         }' |
-    sed -e ":l" \
-        -e "s/\([0-9]\)\([0-9]\{3\}\)/\1,\2/; t l"
+        sed -e ":l" \
+            -e "s/\([0-9]\)\([0-9]\{3\}\)/\1,\2/; t l"
     #    └─ add thousands separator
     #       (changes "1023.2 KB" to "1,023.2 KB")
 }
@@ -197,13 +197,13 @@ db(){
     source ENVIRONMENT
     echo Version $VERSION
     echo POWER_JWT $POWER_JWT
-    dobi $@
+    dobi "$@"
 }
 
 
 dbi() { docker build -t="$1" .; }
-drm() {  docker rm $(docker ps -q -a); }
-dri() { docker rmi $(docker images -q); }
+drm() {  docker rm "$(docker ps -q -a)"; }
+dri() { docker rmi -f $(docker images -q) ;}
 dbash() { docker exec -it $1 bash; }
 dash() { docker exec -it $1 ash; }
 
@@ -213,5 +213,8 @@ setup() {
 }
 
 kport() {
-    lsof -i tcp:$1 | awk 'NR!=1 {print $2}' | xargs kill
+    lsof -i "tcp:$1" | awk 'NR!=1 {print $2}' | xargs kill
+}
+oracle () {
+    docker run -d -p 49160:22 -p 1521:1521 -e ORACLE_ALLOW_REMOTE=true wnameless/oracle-xe-11g
 }

@@ -1,4 +1,5 @@
 My Emacs Configuration! Enjoy
+
 * Basic
   #+BEGIN_SRC emacs-lisp
 
@@ -93,8 +94,8 @@ Version 2017-04-19"
 
 ** StrightPush
    #+begin_src emacs-lisp
-(defun cesco/automatic-push ()
-  (interactive)
+(defun cesco/automatic-push (msg)
+  (interactive "^pCommit msg: ")
   (magit-run-git "commit" "--all"
          (format-time-string "--message=%F %R"))
   (let ((current-branch (magit-get-current-branch)))
@@ -103,6 +104,13 @@ Version 2017-04-19"
                     (concat "origin/" current-branch)
            nil )
     ))
+
+
+(defun cesco/gurizadinha ()
+
+(interactive)
+
+  )
    #+end_src
 
 ** Insert SemiColon
@@ -452,6 +460,20 @@ narrowed."
   (dired-view-file)
   (local-set-key (kbd "C-l") 'View-quit))
 
+(defadvice neo-buffer--get-nodes
+    (after neo-buffer--get-nodes-new-sorter activate)
+  (setq ad-return-value
+        (let ((nodes ad-return-value)
+              (comparator (lambda (s1 s2) (string< (downcase (reverse-file-extension s1))
+                                                   (downcase (reverse-file-extension s2))))))
+          (apply 'cons (mapcar (lambda (x) (sort (apply x (list nodes))
+                                                 comparator))
+                               '(car cdr))))))
+
+(defun reverse-file-extension(filename)
+  (mapconcat 'identity (reverse (split-string filename "\\.")) "."))
+
+
 (use-package dired
   :ensure nil
   :init
@@ -538,10 +560,20 @@ narrowed."
 ** CSS
 
    #+BEGIN_SRC emacs-lisp
+(defun cesco/pcss ()
+  (interactive)
+  (if (file-exists-p (executable-find "tcm"))
+      (if (projectile-project-p)
+	  (if (file-exists-p (concat (projectile-project-root) "tslint.json" ))
+	      (let ((default-directory (file-name-directory (buffer-file-name))))
+		(shell-command (concat "tcm -p *.pcss")))))
+    (message "tcm binary dos not exist!!")))
+
 (use-package css-mode
   :mode (("\\.css\\'" . css-mode)
          ("\\.pcss\\'" . css-mode))
-  :ensure t)
+  :ensure t
+  :config (add-hook 'after-save-hook #'cesco/pcss))
 
    #+END_SRC
 
@@ -819,12 +851,22 @@ narrowed."
 		 :height 1.0
 		 :face all-the-icons-pink))
   (add-to-list 'all-the-icons-icon-alist
-	       '("\\.pcss"
+	       '("\\.pcss$"
 		 all-the-icons-alltheicon "css3"
 		 :height 1.0
 		 :face all-the-icons-red))
   (add-to-list 'all-the-icons-icon-alist
 	       '("\\.tsx$"
+		 all-the-icons-alltheicon "react"
+		 :height 1.0
+		 :face all-the-icons-blue))
+  (add-to-list 'all-the-icons-icon-alist
+	       '("\\.ts$"
+		 all-the-icons-alltheicon "react"
+		 :height 1.0
+		 :face all-the-icons-blue))
+  (add-to-list 'all-the-icons-icon-alist
+	       '("\\.d.ts$"
 		 all-the-icons-alltheicon "react"
 		 :height 1.0
 		 :face all-the-icons-blue))
@@ -880,7 +922,7 @@ narrowed."
   :init (progn
 	  (setq neo-theme (if window-system 'icons 'nerd)) ; 'classic, 'nerd, 'ascii, 'arrow
       (setq neo-force-change-root t)
-	  (setq neo-show-hidden-files t)
+	  (setq neo-show-hidden-files nil)
 	  (add-hook 'neotree-mode-hook 'cesco/neotree-evil)))
    #+END_SRC
 
@@ -1465,7 +1507,7 @@ That is, a string used to represent it on the tab bar."
 	      (eval flycheck-tslint-args)
 	      source-inplace)
     :error-parser flycheck-parse-tslint
-    :modes (web-mode))
+    :modes (web-mode typescript-mode))
 
   ;; (flycheck-add-mode 'typescript-tslint-cesco 'web-mode)
   )
@@ -1656,6 +1698,7 @@ That is, a string used to represent it on the tab bar."
   ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local"  :color blue)
   (";" cesco/insert-semicolon  "insert semicolon" :color blue)
   ("a" hs-show-all "unfold all" :color blue)
+  ("r" tide-restart-server  "all" :color blue)
   ("g" magit-list-repositories "Magit-List-Repos" :color blue)
   ("p" cesco/automatic-push "Automatic push" :color blue )
   ("d" cesco/kill-other-buffers "kill all buffer" :color blue))

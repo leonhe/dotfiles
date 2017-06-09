@@ -1010,6 +1010,7 @@ narrowed."
     '((selection-info :face region :when mark-active)
       ((flycheck-error flycheck-warning flycheck-info) :when active)
       (which-function)
+        (line-column)
       (major-mode  :face mode-line-emphasis)
       (global :when active)
       )))

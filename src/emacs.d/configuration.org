@@ -100,7 +100,7 @@ Version 2017-04-19"
   (message msg)
   (magit-run-git "commit" "--all" (concat "--message=" msg ))
   )
-(cesco/automatic-push "sdfnjk")
+(cesco/automatic-push "cescoteste")
 (defun foo3 (n)             ; foo3 takes one argument,
   (interactive
    (list (read-from-minibuffer "Msg:" nil nil nil nil )))

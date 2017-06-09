@@ -104,7 +104,7 @@ Version 2017-04-19"
     (magit-git-push current-branch
                     (concat "origin/" current-branch)
            nil )
-  )
+  ))
    #+end_src
 
 ** Insert SemiColon

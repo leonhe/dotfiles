@@ -95,21 +95,16 @@ Version 2017-04-19"
 ** StrightPush
    #+begin_src emacs-lisp
 (defun cesco/automatic-push (msg)
-  (interactive "^pCommit msg: ")
-  (magit-run-git "commit" "--all"
-         (format-time-string "--message=%F %R"))
-  (let ((current-branch (magit-get-current-branch)))
-    (message "PUSHING!!!!")
-    (magit-git-push current-branch
-                    (concat "origin/" current-branch)
-           nil )
-    ))
+  (interactive
+   (list (read-from-minibuffer "Msg:" nil nil nil nil )))
+  (message msg)
+  (magit-run-git "commit" "--all" "--message=%F %R")
+  )
 
-
-(defun cesco/gurizadinha ()
-
-(interactive)
-
+(defun foo3 (n)             ; foo3 takes one argument,
+  (interactive
+   (list (read-from-minibuffer "Msg:" nil nil nil nil )))
+  (message n)
   )
    #+end_src
 

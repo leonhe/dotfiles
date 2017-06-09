@@ -1,8 +1,11 @@
 My Emacs Configuration! Enjoy
 
 * Basic
-  #+BEGIN_SRC emacs-lisp
 
+** TODO refactor whole file to use skeeto/with-package hack
+-
+  #+BEGIN_SRC emacs-lisp
+;; automatically add cask dependencies when M-x package-install
 (require 'pallet)
 (pallet-mode t)
 
@@ -30,7 +33,7 @@ My Emacs Configuration! Enjoy
 ** TODO TOOGLE
    #+begin_src emacs-lisp
 (defun xah-toggle-letter-case ()
-  "Toggle the letter case of current word or text selection.
+  "Toggle The letter case of current word or text selection.
 Always cycle in this order: Init Caps, ALL CAPS, all lower.
 
 URL `http://ergoemacs.org/emacs/modernization_upcase-word.html'
@@ -398,6 +401,14 @@ narrowed."
   #+END_SRC
 
 * Packages
+
+** Smooth Scrolling
+   #+begin_src emacs-lisp
+(setq scroll-margin 5
+      scroll-conservatively 9999
+      scroll-step 1)
+   #+end_src
+
 ** HUGO
    #+begin_src emacs-lisp
 (defun cesco/easy-hugo ()
@@ -1618,6 +1629,12 @@ That is, a string used to represent it on the tab bar."
   (evil-define-key 'normal evil-org-mode-map
     "H" 'tabbar-backward-tab
     "L" 'tabbar-forward-tab)
+  (setq evil-emacs-state-cursor '("red" box))
+  (setq evil-normal-state-cursor '("orange" box))
+  (setq evil-visual-state-cursor '("green" box))
+  (setq evil-insert-state-cursor '("red" bar))
+  (setq evil-replace-state-cursor '("red" bar))
+  (setq evil-operator-state-cursor '("red" hollow))
   (evil-mode)
   )
    #+END_SRC
@@ -1690,10 +1707,10 @@ That is, a string used to represent it on the tab bar."
   (";" cesco/insert-semicolon  "insert semicolon" :color blue)
   ("a" hs-show-all "unfold all" :color blue)
   ("r" tide-restart-server  "all" :color blue)
+  ("t" xah-toggle-letter-case  "all" :color blue)
   ("g" magit-list-repositories "Magit-List-Repos" :color blue)
   ("p" cesco/automatic-push "Automatic push" :color blue )
   ("d" cesco/kill-other-buffers "kill all buffer" :color blue))
-
 (global-set-key[(shift control d)] 'cesco/hydra/body)
 
    #+end_src

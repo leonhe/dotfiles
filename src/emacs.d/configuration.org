@@ -4,7 +4,7 @@ My Emacs Configuration! Enjoy
 1. refactor whole file to use skeeto/with-package hack
 2. Set better python environment
 
-* Basic
+* Basic Setup
 
   #+BEGIN_SRC emacs-lisp
 ;; automatically add cask dependencies when M-x package-install
@@ -19,7 +19,7 @@ My Emacs Configuration! Enjoy
 
   #+END_SRC
 
-* Setup
+* Emacs Settings
 
 ** Auto revert mode
    #+begin_src emacs-lisp
@@ -345,7 +345,7 @@ narrowed."
 (setq split-width-threshold 1 )
    #+END_SRC
 
-* Org
+* Org Mode
 
   #+BEGIN_SRC emacs-lisp
 ;; NO spell check for embedded snippets
@@ -402,7 +402,7 @@ narrowed."
 
   #+END_SRC
 
-* Packages
+* 3rd Party Packages
 
 ** Smooth Scrolling
    #+begin_src emacs-lisp
@@ -559,26 +559,6 @@ narrowed."
   :ensure t
   :config
   (global-set-key (kbd "C-x C-p") 'helm-projectile))
-   #+END_SRC
-
-** CSS
-
-   #+BEGIN_SRC emacs-lisp
-(defun cesco/pcss ()
-  (interactive)
-  (if (file-exists-p (executable-find "tcm"))
-      (if (projectile-project-p)
-	  (if (file-exists-p (concat (projectile-project-root) "tslint.json" ))
-	      (let ((default-directory (file-name-directory (buffer-file-name))))
-		(shell-command (concat "tcm -p *.pcss")))))
-    (message "tcm binary dos not exist!!")))
-
-(use-package css-mode
-  :mode (("\\.css\\'" . css-mode)
-         ("\\.pcss\\'" . css-mode))
-  :ensure t
-  :config (add-hook 'after-save-hook #'cesco/pcss))
-
    #+END_SRC
 
 ** Rainbow
@@ -990,7 +970,6 @@ narrowed."
 (use-package eldoc :ensure t :diminish eldoc-mode)
    #+end_src
 
-
 ** ModeLine
 
    #+BEGIN_SRC emacs-lisp
@@ -1246,7 +1225,27 @@ That is, a string used to represent it on the tab bar."
   (tabbar-mode 1))
    #+END_SRC
 
-* Languages
+* Languages Layers
+** CSS
+
+   #+BEGIN_SRC emacs-lisp
+(defun cesco/pcss ()
+  (interactive)
+  (if (file-exists-p (executable-find "tcm"))
+      (if (projectile-project-p)
+	  (if (file-exists-p (concat (projectile-project-root) "tslint.json" ))
+	      (let ((default-directory (file-name-directory (buffer-file-name))))
+		(shell-command (concat "tcm -p *.pcss")))))
+    (message "tcm binary dos not exist!!")))
+
+(use-package css-mode
+  :mode (("\\.css\\'" . css-mode)
+         ("\\.pcss\\'" . css-mode))
+  :ensure t
+  :config (add-hook 'after-save-hook #'cesco/pcss))
+
+   #+END_SRC
+
 ** Golang
 *** Go path
     #+BEGIN_SRC emacs-lisp
@@ -1581,7 +1580,8 @@ That is, a string used to represent it on the tab bar."
   )
    #+END_SRC
 
-* Evil
+* Evil Settings
+
 ** Nerd Commenter
 
    #+begin_src emacs-lisp

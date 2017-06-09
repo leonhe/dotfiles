@@ -1,9 +1,11 @@
 My Emacs Configuration! Enjoy
 
+** TODOS
+1. refactor whole file to use skeeto/with-package hack
+2. Set better python environment
+
 * Basic
 
-** TODO refactor whole file to use skeeto/with-package hack
--
   #+BEGIN_SRC emacs-lisp
 ;; automatically add cask dependencies when M-x package-install
 (require 'pallet)

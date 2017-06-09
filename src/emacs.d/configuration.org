@@ -98,9 +98,9 @@ Version 2017-04-19"
   (interactive
    (list (read-from-minibuffer "Msg:" nil nil nil nil )))
   (message msg)
-  (magit-run-git "commit" "--all" "--message=%F %R")
+  (magit-run-git "commit" "--all" (concat "--message=" msg ))
   )
-
+(cesco/automatic-push "sdfnjk")
 (defun foo3 (n)             ; foo3 takes one argument,
   (interactive
    (list (read-from-minibuffer "Msg:" nil nil nil nil )))

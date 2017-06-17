@@ -27,6 +27,9 @@ create_symlinks() {
         "git/gitconfig"
         "git/gitignore"
 
+        "zsh/zshrc"
+        "zsh/oh-my-zsh"
+
         "vim/vim"
         "vim/vimrc"
         "kube"

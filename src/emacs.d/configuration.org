@@ -1,6 +1,6 @@
 My Emacs Configuration! Enjoy
 
-** TODOS
+* TODOS
 1. refactor whole file to use skeeto/with-package hack
 2. Set better python environment
 
@@ -32,7 +32,7 @@ My Emacs Configuration! Enjoy
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
    #+end_src
 
-** TODO TOOGLE
+** TOOGLE
    #+begin_src emacs-lisp
 (defun xah-toggle-letter-case ()
   "Toggle The letter case of current word or text selection.
@@ -404,6 +404,25 @@ narrowed."
 
 * 3rd Party Packages
 
+
+** Highli
+   #+begin_src emacs-lisp
+(use-package hl-line+
+  :ensure t
+  :config
+  (set-face-background 'hl-line "DarkSlateGrey")
+  (hl-line-when-idle-interval 300)
+  (toggle-hl-line-when-idle 1)
+  (global-hl-line-mode))
+   #+end_src
+
+** Fill Collumn Indicator
+   #+begin_src emacs-lisp
+(use-package fill-column-indicator
+  :ensure t
+  :config)
+   #+end_src
+
 ** Smooth Scrolling
    #+begin_src emacs-lisp
 (setq scroll-margin 5
@@ -489,11 +508,21 @@ narrowed."
   (setq dired-listing-switches "-aBhl  --group-directories-first ")
   (define-key dired-mode-map (kbd "H") 'tabbar-backward)
   (define-key dired-mode-map (kbd "L") 'tabbar-forward)
+  (define-key dired-mode-map (kbd "q") 'evil-delete-buffer)
   (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
   (define-key dired-mode-map (kbd "TAB") 'dired-find-alternate-file)
   (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file ".."))))
 
+(use-package dired+
+  :after dired
+  :init
+  (progn
+    (setq diredp-hide-details-propagate-flag nil)
+    (setq diredp-hide-details-initially-flag nil)
+    (diredp-toggle-find-file-reuse-dir 1)))
+
 (use-package all-the-icons-dired
+  :after dired
   :commands (all-the-icons-dired-mode)
   :init
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
@@ -995,16 +1024,19 @@ narrowed."
   (set-face-attribute 'powerline-active1 nil :background "grey10" :foreground "white smoke")
   (set-face-attribute 'mode-line-buffer-id nil :foreground "#E1BEE7" :background "#8b0000")
   (set-face-attribute 'mode-line-emphasis  nil :foreground "white" :background "purple")
-  (set-face-attribute 'mode-line nil :foreground "Black" :background "black" :box nil)
+  (set-face-attribute 'mode-line nil :foreground "white" :background "black" :box nil)
   (set-face-attribute 'mode-line-inactive nil :background "#4682b4" :box nil)
   (set-face-attribute 'powerline-active1 nil :foreground "White" :background "grey22" :box nil)
   (set-face-attribute 'powerline-active2 nil :foreground "Black" :background "grey22" :box nil)
+  (setq spaceline-workspace-numbers-unicode t)
+  (setq spaceline-window-numbers-unicode t)
   (spaceline-install
     'main
     '(
       (evil-state :face highlight-face :when t)
       (projectile-root  :face mode-line-emphasis)
       ((remote-host buffer-id version-control) :separator "  " :face mode-line-buffer-id )
+      ( workspace-number )
       (nyan-cat)
       (process :when active))
     '((selection-info :face region :when mark-active)
@@ -1490,42 +1522,34 @@ That is, a string used to represent it on the tab bar."
 ** Typescript
 
    #+BEGIN_SRC emacs-lisp
-(defun cesco/tide-checker ()
+(flycheck-def-config-file-var flycheck-typescript-tsconfig
+    typescript-tslint "tslint.json"
+  :safe #'stringp
+  :package-version '(flycheck . "27"))
 
-  (flycheck-def-option-var flycheck-typescript-tsconfig
-      nil typescript-tslint-cesco
-    "The path of tsconfig.json ."
-    :type '(choice (const :tag "No custom tsconfig file" nil)
+(flycheck-define-checker typescript-tslint-cesco
+  "TypeScript style checker using TSLint."
+  :command ("tslint" "--format" "json"
+	    (config-file "--config" flycheck-typescript-tslint-config)
+	    (config-file "--project" flycheck-typescript-tsconfig)
+	    (option "--rules-dir" flycheck-typescript-tslint-rulesdir)
+	    (eval flycheck-tslint-args)
+	    source-inplace)
+  :error-parser flycheck-parse-tslint
+  :modes (web-mode typescript-mode))
 
+(flycheck-add-mode 'typescript-tslint-cesco 'web-mode)
 
-		   (directory :tag "Custom tsconfig.json"))
-    :safe #'stringp
-    :package-version '(flycheck . "27"))
-
-  (flycheck-define-checker typescript-tslint-cesco
-    "TypeScript style checker using TSLint."
-    :command ("tslint" "--format" "json"
-	      (config-file "--config" flycheck-typescript-tslint-config)
-	      (config-file "--project" flycheck-typescript-tsconfig)
-	      (option "--rules-dir" flycheck-typescript-tslint-rulesdir)
-	      (eval flycheck-tslint-args)
-	      source-inplace)
-    :error-parser flycheck-parse-tslint
-    :modes (web-mode typescript-mode))
-
-  ;; (flycheck-add-mode 'typescript-tslint-cesco 'web-mode)
-  )
 (defun cesco/tslint ()
-  (setq flycheck-tslint-args . (nil))
-  (flycheck-select-checker 'typescript-tslint)
+  ;; (flycheck-select-checker 'typescript-tslint)
   )
 (defun cesco/custom-tslint ()
   (if (projectile-project-p)
       (if (file-exists-p (concat ( projectile-project-root ) "tsconfig.json"))
 	  (progn
-	    ;; (setq flycheck-tslint-args . ("--type-check"))
 	    (setq flycheck-typescript-tsconfig . ( (concat projectile-project-root "tsconfig.json" )))
-	    (flycheck-select-checker 'typescript-tslint-cesco))
+	    ;; (flycheck-select-checker 'typescript-tslint-cesco)
+	    )
         (cesco/tslint)
 	)))
 
@@ -1533,20 +1557,21 @@ That is, a string used to represent it on the tab bar."
           (lambda ()
             (make-local-variable 'js-indent-level)
             (setq js-indent-level 2)))
+
 (defun cesco/tide-mode ()
   (interactive)
   (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
   (setq tide-tsserver-executable "node_modules/.bin/tsserver")
   (tide-setup)
-  (cesco/custom-tslint)
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   (add-hook 'before-save-hook 'tide-format-before-save)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (company-mode +1)
   ;; (add-to-list 'company-backends '(company-tide :with company-yasnippet))
-  (set (make-local-variable 'company-backends)
-       '((company-tide company-files company-yasnippet))))
+  ;; (set (make-local-variable 'company-backends)
+  ;;      '((company-tide company-files company-yasnippet)))
+  )
 
 (defun cesco/tide-evil ()
   (evil-leader/set-key-for-mode 'web-mode
@@ -1560,7 +1585,6 @@ That is, a string used to represent it on the tab bar."
   :after (flycheck evil-leader)
   :config
   (cesco/tide-evil)
-  (cesco/tide-checker)
   (add-hook 'typescript-mode-hook #'cesco/tide-mode) )
 
 (use-package web-mode :ensure t
@@ -1673,6 +1697,7 @@ That is, a string used to represent it on the tab bar."
     "i" 'cesco/indent
     "TAB" 'org-cycle
     "p" 'projectile-switch-project
+    "d" 'magit-diff-buffer-file
     (kbd ".") (lambda () (interactive)(golden-ratio)(ace-window ""))
     (kbd "n") (lambda () (interactive)(golden-ratio)(ace-window ""))
     (kbd "o") (lambda () (interactive) (find-file "~/.emacs.d/configuration.org")))
@@ -1690,6 +1715,15 @@ That is, a string used to represent it on the tab bar."
 
 ** Personal Hydra!
    #+begin_src emacs-lisp
+(defun english-lang ()
+  (interactive)
+  (setq ispell-dictionary "pt_BR")
+  (message "Language: English")
+  (flyspell-buffer)
+  )
+
+
+
 (defhydra cesco/hydra ()
   "
   ^Window^        ^Hugo^            ^SEARCH^             ^GIT^              ^Others^
@@ -1708,14 +1742,18 @@ That is, a string used to represent it on the tab bar."
   ("e" (lambda () (interactive)(find-file "~/.emacs.d/configuration.org")) "init.org"  :color blue)
   ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local"  :color blue)
   (";" cesco/insert-semicolon  "insert semicolon" :color blue)
-  ("a" hs-show-all "unfold all" :color blue)
-  ("r" tide-restart-server  "all" :color blue)
-  ("t" xah-toggle-letter-case  "all" :color blue)
-  ("g" magit-list-repositories "Magit-List-Repos" :color blue)
-  ("p" cesco/automatic-push "Automatic push" :color blue )
-  ("d" cesco/kill-other-buffers "kill all buffer" :color blue))
-(global-set-key[(shift control d)] 'cesco/hydra/body)
+("a" hs-show-all "unfold all" :color blue)
+("r" tide-restart-server  "all" :color blue)
+("W" english-lang  "dasdkn all" :color blue)
+("w" (lambda () (interactive) (setq ispell-dictionary "es")(message "Language: English")
+       (flyspell-buffer)
 
+       )  "the other" :color blue)
+("t" xah-toggle-letter-case  "all" :color blue)
+("g" magit-list-repositories "Magit-List-Repos" :color blue)
+("p" cesco/automatic-push "Automatic push" :color blue )
+("d" cesco/kill-other-buffers "kill all buffer" :color blue))
+(global-set-key[(shift control d)] 'cesco/hydra/body)
    #+end_src
 
 ** Help Hydra!

@@ -1715,13 +1715,13 @@ That is, a string used to represent it on the tab bar."
 
 ** Personal Hydra!
    #+begin_src emacs-lisp
-(defun english-lang ()
+(defun cesco/switch-dictionary ()
   (interactive)
-  (setq ispell-dictionary "pt_BR")
-  (message "Language: English")
-  (flyspell-buffer)
-  )
-
+  (let* ((dic ispell-current-dictionary)
+    	 (change (if (string= dic "pt_BR") "english" "pt_BR")))
+    (ispell-change-dictionary change)
+    (message "Dictionary switched from %s to %s" dic change)
+    ))
 
 
 (defhydra cesco/hydra ()

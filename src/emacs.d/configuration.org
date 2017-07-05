@@ -22,6 +22,20 @@ My Emacs Configuration! Enjoy
 
 * Emacs Settings
 
+
+** Switch Ispell Dictionary
+   #+begin_src emacs-lisp
+
+(defun cesco/switch-dictionary ()
+  (interactive)
+  (let* ((dic ispell-current-dictionary)
+    	 (change (if (string= dic "pt_BR") "english" "pt_BR")))
+    (ispell-change-dictionary change)
+    (message "Dictionary switched from %s to %s" dic change)
+    ))
+
+   #+end_src
+
 ** Rename Current Buffer
    #+begin_src emacs-lisp
 ;; Originally from stevey, adapted to support moving to a new directory.
@@ -1695,7 +1709,7 @@ That is, a string used to represent it on the tab bar."
 
    #+END_SRC
 
-**
+   **
 ** Typescript
 
    #+BEGIN_SRC emacs-lisp
@@ -2025,14 +2039,6 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 ** Personal Hydra!
    #+begin_src emacs-lisp
-(defun cesco/switch-dictionary ()
-  (interactive)
-  (let* ((dic ispell-current-dictionary)
-    	 (change (if (string= dic "pt_BR") "english" "pt_BR")))
-    (ispell-change-dictionary change)
-    (message "Dictionary switched from %s to %s" dic change)
-    ))
-
 
 (defhydra cesco/hydra ()
   "
@@ -2051,14 +2057,14 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ("H" (lambda () (interactive) (setq easy-hugo-postdir "content/fixed") (easy-hugo))   "Fixed" :color blue)
   ("e" (lambda () (interactive)(find-file "~/.emacs.d/configuration.org")) "init.org"  :color blue)
   ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local"  :color blue)
-  (";" cesco/insert-semicolon  "insert semicolon" :color blue)
-("a" hs-show-all "unfold all" :color blue)
-("r" tide-restart-server  "all" :color blue)
-("t" xah-toggle-letter-case  "all" :color blue)
-("g" magit-list-repositories "Magit-List-Repos" :color blue)
-("p" cesco/automatic-push "Automatic push" :color blue )
-("c" flyspell-buffer "Automatic push" :color blue )
-("d" cesco/kill-other-buffers "kill all buffer" :color blue))
+  ("a" hs-show-all "Unfold all" :color blue)
+  ("r" tide-restart-server  "Restart tide server" :color blue)
+  ("t" xah-toggle-letter-case  "Toogle case" :color blue)
+  ("g" magit-list-repositories "Magit-List-Repos" :color blue)
+  ("p" cesco/automatic-push "Automatic push" :color blue )
+  ("c" flyspell-buffer "Correct Orthografy" :color blue )
+  ("d" cesco/kill-other-buffers "kill all buffer" :color blue)
+)
 (global-set-key[(shift control d)] 'cesco/hydra/body)
 
 (defhydra cesco/tshydra ()
@@ -2097,7 +2103,7 @@ Workspace _3_   Workspace _8_   _l_ast workspace
 Workspace _4_   Workspace _9_   _c_lose workspace
 Workspace _5_   Workspace _0_
 "
-  ("1" eyebrowse-switch-to-window-config-0)
+  ("1" eyebrowse-switch-to-window-config-1)
   ("2" eyebrowse-switch-to-window-config-2)
   ("3" eyebrowse-switch-to-window-config-3)
   ("4" eyebrowse-switch-to-window-config-4)
@@ -2112,7 +2118,7 @@ Workspace _5_   Workspace _0_
   ("l" eyebrowse-last-window-config)
   ("c" eyebrows-close-window-config))
 
-(global-set-key[(shift control e)] 'cesco/hydra/body)
+(global-set-key[(shift control e)] 'cesco/hydra-eyebrowse/body)
 
    #+end_src
 
@@ -2186,4 +2192,4 @@ Workspace _5_   Workspace _0_
         (face-attribute face :inherit))))
     (list 'org-code 'org-block 'org-table )))
    #+end_src
-  that me
+   that me

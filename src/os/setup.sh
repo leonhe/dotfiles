@@ -258,12 +258,16 @@ main() {
     ./create_symbolic_links.sh "$@"
 
 
- 
-    
-    
-    ./install/main.sh
-    ./preferences/main.sh
-  
+
+    if ! $skipQuestions; then
+        ./install/main.sh
+    fi
+
+
+    if ! $skipQuestions; then
+        ./preferences/main.sh
+    fi
+
 
 
     if cmd_exists "git"; then

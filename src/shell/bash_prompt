@@ -115,13 +115,7 @@ set_prompts() {
     fi
 
 
-    PS2="⚡ "
 
-    export PS2
-
-    PS4="+$( tput cr && tput cuf 6 && printf "%s $reset" )"
-
-    export PS4
 
 }
 

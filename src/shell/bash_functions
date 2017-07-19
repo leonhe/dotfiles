@@ -66,41 +66,6 @@ delete-files() {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Get gzip information (gzipped file size + reduction size).
-
-gz() {
-
-    declare -i gzippedSize=0
-    declare -i originalSize=0
-
-    if [ -f "$1" ]; then
-        if [ -s "$1" ]; then
-
-            originalSize=$( wc -c < "$1" )
-            printf "\n original size:   %12s\n" "$(hrfs "$originalSize")"
-
-            gzippedSize=$( gzip -c "$1" | wc -c )
-            printf " gzipped size:    %12s\n" "$(hrfs "$gzippedSize")"
-
-            printf " ─────────────────────────────\n"
-            printf " reduction:       %12s [%s%%]\n\n" \
-                   "$( hrfs $((originalSize - gzippedSize)) )" \
-                   "$( printf "%s %s" "$originalSize $gzippedSize" | \
-                            awk '{ printf "%.1f", 100 - $2 * 100 / $1 }' | \
-                            sed -e "s/0*$//;s/\.$//" )"
-            #              └─ remove tailing zeros
-
-        else
-            printf "\"%s\" is empty.\n" "$1"
-        fi
-    else
-        printf "\"%s\" is not a file.\n" "$1"
-    fi
-
-}
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 # Human readable file size
 # (because `du -h` doesn't cut it for me).
 
@@ -191,21 +156,12 @@ update_terminal_cwd() {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Run dobi but sources a files called ENVIRONMENT from the current location
-
-db(){
-    source ENVIRONMENT
-    echo Version $VERSION
-    echo POWER_JWT $POWER_JWT
-    dobi "$@"
-}
-
 
 dbi() { docker build -t="$1" .; }
 drm() {  docker rm "$(docker ps -q -a)"; }
-dri() { docker rmi -f $(docker images -q) ;}
-dbash() { docker exec -it $1 bash; }
-dash() { docker exec -it $1 ash; }
+dri() { docker rmi -f "$(docker images -q)" ;}
+dbash() { docker exec -it "$1" bash; }
+dash() { docker exec -it "$1" ash; }
 
 
 setup() {

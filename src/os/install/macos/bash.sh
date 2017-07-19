@@ -54,9 +54,8 @@ get_homebrew_bash_path() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    path="$(brew --prefix 2> /dev/null)/bin/bash"
 
-    if [ $? -eq 0 ]; then
+    if path="$(brew --prefix 2> /dev/null)/bin/bash" ; then
         printf "%s" "$path"
         return 0
     else

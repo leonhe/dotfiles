@@ -22,7 +22,6 @@ My Emacs Configuration! Enjoy
 
 * Emacs Settings
 
-
 ** Switch Ispell Dictionary
    #+begin_src emacs-lisp
 
@@ -847,6 +846,7 @@ the entire subtree."
     '(javascript-jshint)))
 
 (flycheck-add-mode 'javascript-eslint 'web-mode)
+(flycheck-add-mode 'javascript-eslint 'js2-mode)
 
 
 
@@ -1431,7 +1431,7 @@ That is, a string used to represent it on the tab bar."
   (tabbar-mode 1))
    #+END_SRC
 
-* Languages Layersg
+* Languages Layers
 ** CSS
 
    #+BEGIN_SRC emacs-lisp
@@ -1681,25 +1681,23 @@ That is, a string used to represent it on the tab bar."
 
    #+BEGIN_SRC emacs-lisp
 (use-package js2-mode
+  :mode (("\\.js\\'" . js2-mode))
   :commands (js2-mode)
   :config
-  (progn (evil-leader/set-key-for-mode 'js2-mode
-	   "j"  (lambda ()
-		  (interactive)
-		  (js2-jump-to-definition )
-		  )
-	   )
-
-
-
-   (flycheck-select-checker 'javascript-eslint)
-(add-hook 'js2-mode-hook
-          (defun my-js2-mode-setup ()
-            (when (executable-find "eslint")
-              (flycheck-select-checker 'javascript-eslint))))
-
-)
-  :mode (("\\.js\\'" . js2-mode)))
+  (progn
+    (setq
+   ; Configure prettier mode
+   prettier-js-args '("--single-quote"  ))
+    (evil-leader/set-key-for-mode 'js2-mode
+      "j"  (lambda ()
+	     (interactive)
+	     (js2-jump-to-definition )))
+    (add-hook 'js2-mode-hook
+	      (defun my-js2-mode-setup ()
+		(when (executable-find "eslint")
+		  (flycheck-select-checker 'javascript-eslint))))
+    )
+  )
 
 
 
@@ -1783,9 +1781,6 @@ That is, a string used to represent it on the tab bar."
 (use-package web-mode :ensure t
   :ensure tide
   :mode (
-
-
-("\\.js" . web-mode)
 ("\\.tsx$" . web-mode)
          ("\\.jsx$" . web-mode))
   :config

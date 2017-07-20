@@ -136,16 +136,6 @@ Version 2017-04-19"
 (use-package hideshow
   :diminish hs-minor-mode
   :config
-  (defun hs-hide-stuff ()
-    (hs-minor-mode 1)
-    (hs-hide-level 3))
-  (add-hook 'js2-mode-hook #'hs-hide-stuff )
-  (add-hook 'web-mode-hook 'hs-minor-mode )
-  (add-hook 'go-mode-hook #'hs-hide-stuff )
-  (add-hook 'java-mode-hook #'hs-hide-stuff )
-  (add-hook 'emacs-lisp-mode-hook #'hs-hide-stuff )
-  (add-hook 'lisp-mode-hook #'hs-hide-stuff )
-  (add-hook 'python-mode-hook #'hs-hide-stuff )
   )
    #+end_src
 
@@ -823,6 +813,15 @@ the entire subtree."
 
    #+BEGIN_SRC emacs-lisp
 
+(defun my/use-eslint-from-node-modules ()
+  (let* ((root (locate-dominating-file
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (eslint (and root
+                      (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
 (use-package flycheck
   :diminish flycheck-mode
   :bind (("M-n" . flycheck-next-error) ("M-p" . flycheck-previous-error))
@@ -834,7 +833,7 @@ the entire subtree."
   (set-face-attribute 'flycheck-error nil :background "#8c5353")
   (set-face-attribute 'flycheck-warning nil :background "#535399")
 
-
+(add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
 
 
 (add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
@@ -1110,7 +1109,7 @@ the entire subtree."
   :init (progn
 	  (setq neo-theme (if window-system 'icons 'nerd)) ; 'classic, 'nerd, 'ascii, 'arrow
       (setq neo-force-change-root t)
-	  (setq neo-show-hidden-files nil)
+	  (setq neo-show-hidden-files t)
 	  (add-hook 'neotree-mode-hook 'cesco/neotree-evil)))
    #+END_SRC
 
@@ -1685,9 +1684,8 @@ That is, a string used to represent it on the tab bar."
   :commands (js2-mode)
   :config
   (progn
-    (setq
-   ; Configure prettier mode
-   prettier-js-args '("--single-quote"  ))
+    (setq prettier-js-args '("--single-quote"  ))
+    (add-hook 'js2-mode-hook 'prettier-js-mode)
     (evil-leader/set-key-for-mode 'js2-mode
       "j"  (lambda ()
 	     (interactive)
@@ -1834,6 +1832,16 @@ That is, a string used to represent it on the tab bar."
   :config
   (global-evil-surround-mode))
    #+END_SRC
+
+
+** MultipleCursor
+   #+begin_src emacs-lisp
+(use-package evil-mc
+  :after (evil)
+  :ensure t
+  :init (global-evil-mc-mode 1))
+   #+end_src
+
 
 ** Evil itself
 

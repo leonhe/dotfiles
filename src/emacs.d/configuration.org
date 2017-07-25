@@ -1265,10 +1265,15 @@ the entire subtree."
 
 ** Startup Screen
    #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-screen t)
 (use-package dashboard
   :config
-  (dashboard-setup-startup-hook))
+  (use-package page-break-lines
+    :ensure t)
+  (dashboard-setup-startup-hook)
+  (setq inhibit-startup-screen t)
+  (setq dashboard-items '((recents  . 15)
+			  (bookmarks . 15)))
+  (dashboard-insert-startupify-lists))
 
    #+END_SRC
 
@@ -1683,18 +1688,15 @@ That is, a string used to represent it on the tab bar."
   :mode (("\\.js\\'" . js2-mode))
   :commands (js2-mode)
   :config
-  (progn
-    (setq prettier-js-args '("--single-quote"  ))
-    (add-hook 'js2-mode-hook 'prettier-js-mode)
-    (evil-leader/set-key-for-mode 'js2-mode
-      "j"  (lambda ()
-	     (interactive)
-	     (js2-jump-to-definition )))
-    (add-hook 'js2-mode-hook
-	      (defun my-js2-mode-setup ()
-		(when (executable-find "eslint")
-		  (flycheck-select-checker 'javascript-eslint))))
-    )
+  (setq prettier-js-args '("--single-quote"  ))
+  (evil-leader/set-key-for-mode 'js2-mode "j"  'js2-jump-to-definition)
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'js2-mode-hook
+	    (defun my-js2-mode-setup ()
+
+  (flycheck-add-mode 'javascript-eslint 'js2-mode)
+	      (when (executable-find "eslint")
+		(flycheck-select-checker 'javascript-eslint))))
   )
 
 

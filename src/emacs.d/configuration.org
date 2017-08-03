@@ -1,7 +1,7 @@
 My Emacs Configuration! Enjoy
 
 * TODOS
-** TODO refactor whole file to use skeeto/with-package hack
+** TODO re factor whole file to use skeeto/with-package hack
 ** TODO Set better python environment
 ** TODO Set better javascript environment
 
@@ -21,6 +21,23 @@ My Emacs Configuration! Enjoy
   #+END_SRC
 
 * Emacs Settings
+
+** whitespace
+   #+begin_src emacs-lisp
+(progn
+ ;; Make whitespace-mode with very basic background coloring for whitespaces.
+  ;; http://ergoemacs.org/emacs/whitespace-mode.html
+  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark )))
+
+  ;; Make whitespace-mode and whitespace-newline-mode use “¶” for end of line char and “▷” for tab.
+  (setq whitespace-display-mappings
+        ;; all numbers are unicode codepoint in decimal. e.g. (insert-char 182 1)
+        '(
+          (space-mark 32 [183] [46]) ; SPACE 32 「 」, 183 MIDDLE DOT 「·」, 46 FULL STOP 「.」
+          (newline-mark 10 [182 10]) ; LINE FEED,
+          (tab-mark 9 [9655 9] [92 9]) ; tab
+          )))
+   #+end_src
 
 ** Switch Ispell Dictionary
    #+begin_src emacs-lisp
@@ -228,7 +245,7 @@ Version 2017-04-19"
  ((string-equal system-type "gnu/linux")
   (set-face-attribute 'default nil :height 115))
  ((string-equal system-type "darwin")
-  (set-face-attribute 'default nil :height 150))
+  (set-face-attribute 'default nil :height 155))
  )
 
    #+END_SRC
@@ -612,7 +629,7 @@ the entire subtree."
         easy-hugo-preview-url "http://127.0.0.1:1313/me"
         easy-hugo-sshdomain "me"
         easy-hugo-root "~/go/src/github.com/cescoferraro/me/"
-        easy-hugo-previewtime "500")
+        easy-hugo-previewtime "20")
   (add-hook 'easy-hugo-mode-hook 'cesco/easy-hugo))
 
    #+end_src
@@ -1191,6 +1208,13 @@ the entire subtree."
    spaceline-flycheck-bullet "❖ %s"
    spaceline-separator-dir-left '(left . left)
    spaceline-separator-dir-right '(right . right))
+  (spaceline-define-segment kanu/display-time
+    (when (eq (display-time-mode) t)
+      (concat (if-fa "clock-o" "T: ") display-time-string)))
+
+
+  (display-time)
+
   (set-face-attribute 'spaceline-evil-emacs nil :background "#Ff8c00"  )
   (set-face-attribute 'spaceline-evil-insert nil :background "#5fd7ff" :foreground "black")
   (set-face-attribute 'spaceline-evil-motion nil :background "#Eecfa1")
@@ -1218,7 +1242,8 @@ the entire subtree."
     '((selection-info :face region :when mark-active)
       ((flycheck-error flycheck-warning flycheck-info) :when active)
       (which-function)
-        (line-column)
+
+      (line-column)
       (major-mode  :face mode-line-emphasis)
       (global :when active)
       )))
@@ -1772,6 +1797,14 @@ That is, a string used to represent it on the tab bar."
     )
   )
 
+(defun cesco/hugo ()
+  (if (projectile-project-p)
+      (if (file-exists-p (concat (projectile-project-root) "config.toml"))
+	  (web-mode-set-engine "go")
+	(message "do not exists") ;; You can safely delet this line
+	)
+    )
+  )
 
 (use-package tide
   :diminish tide-mode
@@ -1779,22 +1812,27 @@ That is, a string used to represent it on the tab bar."
   :config
   (cesco/tide-evil)
   (add-hook 'typescript-mode-hook #'cesco/tide-mode) )
-
+(defun my-web-mode-hook ()
+  "Hooks for Web mode."
+  (setq web-mode-markup-indent-offset 4)
+  )
 (use-package web-mode :ensure t
   :ensure tide
   :mode (
-("\\.tsx$" . web-mode)
+	 ("\\.tsx$" . web-mode)
+	 ("\\.html" . web-mode)
          ("\\.jsx$" . web-mode))
   :config
   (add-hook 'web-mode-hook
 	    (lambda ()
 	      (when (string-equal "tsx" (file-name-extension buffer-file-name))
 		(cesco/tide-mode))))
-
   (add-hook 'web-mode-hook
 	    (lambda ()
 	      (when (string-equal "jsx" (file-name-extension buffer-file-name))
 		(cesco/tide-mode))))
+  (add-hook 'web-mode-hook  'my-web-mode-hook)
+  (add-hook 'web-mode-hook 'cesco/hugo)
 
   )
    #+END_SRC

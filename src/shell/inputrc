@@ -1,22 +1,23 @@
-#!/bin/bash
+# Based on Brendan Miller's initial bash .inputrc
+# INSTALL
+# to install, rename this file to just ".inputrc"
+# place this file in your home dir. e.g. ~/.inputrc
+# restart your terminal. Then, bash's keybinding for editing
+# should be like ErgoEmacs.
+# If no key works, try replace all \e to \M-. That's means change Esc to Meta key.
 
-# Readline library configuration options.
-# http://ss64.com/bash/syntax-inputrc.html
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Disable beeping and window flashing.
-
-set bell-style none
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Use case-insensitive TAB autocompletion.
-
-set completion-ignore-case on
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Auto list TAB completions.
-
-set show-all-if-ambiguous off
+set editing-mode emacs
+"\C-b": backward-char
+"\C-f": forward-char
+"\M-b": backward-word
+"\C-M-b": backward-word
+"\M-f": forward-word
+"\C-M-f": forward-word
+"\C-k": kill-line
+"\M-DEL": backward-kill-word
+"\M-d": kill-word
+"\C-d": delete-char
+"\C-x u": undo
+"\C-w": kill-region
+"\C-y": yank
+"\C-r": reverse-search-history

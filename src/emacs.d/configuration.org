@@ -1283,7 +1283,7 @@ the entire subtree."
     (setq company-dabbrev-downcase 0)
     (setq company-idle-delay 0)
     (setq company-dabbrev-code-everywhere t)
-    (setq company-minimum-prefix-length 1)
+    (setq company-minimum-prefix-length 0)
     (setq-default company-idle-delay 0)
     (setq-default company-tooltip-align-annotations t)
     )
@@ -2058,6 +2058,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
     "w" 'delete-window
     "e" 'kill-this-buffer
     "," 'previous-buffer
+    "," 'previous-buffer
     "a" 'helm-projectile-ag
     "r" 'helm-recentf
     "SPC" 'helm-M-x
@@ -2114,13 +2115,14 @@ If COUNT is given, move COUNT - 1 lines downward first."
 
 (defhydra cesco/tshydra ()
   "
-  ^Window^        ^Hugo^            ^SEARCH^             ^GIT^              ^Others^
+  ^Typescript^
 ----------------------------------------------------------------------------------------
+[_t_] Tslint    [_f_] tide-fix  [_r_] tide-references
 ^ ^
 "
   ("f" tide-fix "tide-fix" :color blue)
   ("r" tide-references "tide-references" :color blue)
-
+  ("t" (flycheck-select-checker 'typescript-tslint-cesco) "tide-references" :color blue)
   )
 (global-set-key[(shift control t)] 'cesco/tshydra/body)
    #+end_src

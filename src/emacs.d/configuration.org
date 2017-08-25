@@ -2059,6 +2059,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
     "e" 'kill-this-buffer
     "," 'previous-buffer
     "," 'previous-buffer
+    "t" (lambda () (interactive)  (flycheck-select-checker 'typescript-tslint-cesco) )
     "a" 'helm-projectile-ag
     "r" 'helm-recentf
     "SPC" 'helm-M-x

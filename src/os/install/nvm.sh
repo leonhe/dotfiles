@@ -34,7 +34,7 @@ export NVM_DIR=\"$NVM_DIRECTORY\"
 
 }
 
-install_latest_stable_node_6() {
+install_latest_stable_node_8() {
 
     # Install the latest stable version of Node
     # (this will also set it as the default).
@@ -42,8 +42,8 @@ install_latest_stable_node_6() {
 
     execute \
         ". $NVM_DIRECTORY/nvm.sh \
-            && nvm install 6 && nvm use 6 --default" \
-        "nvm (install latest Node 6)"
+            && nvm install 8 && nvm use 8 --default" \
+        "nvm (install latest Node 8)"
 }
 
 install_nvm() {

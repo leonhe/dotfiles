@@ -2093,7 +2093,8 @@ If COUNT is given, move COUNT - 1 lines downward first."
 ----------------------------------------------------------------------------------------
 [_=_] Zoom IN   [_h_] Posts      [_1_] GOOGLE      [_p_] Auto-PUSH    [_d_] Kill all Buffers
 [_-_] Zoom Out  [_H_] Tabs       [_2_] GITHUB      [_g_] Repo's List  [_p_] Mark all
-^ ^             [_C-p_] Preview
+^ ^             [_C-p_] Preview  ^ ^               ^ ^                [_b_] Edit ~/.bash.local
+
 "
   ("C-p" easy-hugo-preview "in" :color blue)
   ("=" text-scale-increase "in")
@@ -2103,7 +2104,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ("h" (lambda () (interactive) (setq easy-hugo-postdir "content/blog") (easy-hugo))   "Posts" :color blue)
   ("H" (lambda () (interactive) (setq easy-hugo-postdir "content/fixed") (easy-hugo))   "Fixed" :color blue)
   ("e" (lambda () (interactive)(find-file "~/.emacs.d/configuration.org")) "init.org"  :color blue)
-  ("b" (lambda () (interactive)(find-file "~/.bash.local")) "bash.local"  :color blue)
+  ("b" (lambda () (interactive) (find-file "~/.bash.local") (shell-script-mode)) "bash.local"  :color blue)
   ("a" hs-show-all "Unfold all" :color blue)
   ("r" tide-restart-server  "Restart tide server" :color blue)
   ("t" xah-toggle-letter-case  "Toogle case" :color blue)

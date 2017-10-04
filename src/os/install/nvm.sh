@@ -81,7 +81,7 @@ main() {
         update_nvm
     fi
 
-    install_latest_stable_node_6
+    install_latest_stable_node_8
 
 }
 

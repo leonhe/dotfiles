@@ -54,3 +54,5 @@ unset -f source_bash_files
 
 
 clear
+
+[ -s "/home/cescoferraro/.jabba/jabba.sh" ] && source "/home/cescoferraro/.jabba/jabba.sh"

@@ -298,10 +298,7 @@ Version 2017-04-19"
 
 ** Set Theme
    #+BEGIN_SRC emacs-lisp
-(use-package spacemacs-theme
-  :ensure t
-  :init
-  (load-theme 'spacemacs-dark t))
+  (load-theme 'spacemacs-dark t)
    #+END_SRC
 
 ** Hide ToolBar
@@ -558,6 +555,7 @@ the entire subtree."
           (setq eyebrowse-wrap-around t
                 eyebrowse-new-workspace t)
           (eyebrowse-mode 1)
+          (eyebrowse-rename-window-config 0 "Cesco")
           (eyebrowse-switch-to-window-config-0))
   :diminish eyebrowse-mode)
 
@@ -565,13 +563,6 @@ the entire subtree."
 
 ** Highli
    #+begin_src emacs-lisp
-(use-package hl-line+
-  :ensure t
-  :config
-  (set-face-background 'hl-line "DarkSlateGrey")
-  (hl-line-when-idle-interval 300)
-  (toggle-hl-line-when-idle 1)
-  (global-hl-line-mode))
    #+end_src
 
 ** Fill Collumn Indicator
@@ -676,7 +667,7 @@ the entire subtree."
   :config
   (progn
     (setq dired-omit-files (concat dired-omit-files "\\|^.DS_STORE$\\|^.projectile$"))
-    (diredp-toggle-find-file-reuse-dir 1))
+)
   :init
   (progn
     (setq diredp-hide-details-propagate-flag nil)
@@ -2113,6 +2104,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
   ("p" cesco/automatic-push "Automatic push" :color blue )
   ("c" flyspell-buffer "Correct Orthografy" :color blue )
   ("d" cesco/kill-other-buffers "kill all buffer" :color blue)
+  ("y" godoctor-godoc "godoctor godoc" :color blue)
 )
 (global-set-key[(shift control d)] 'cesco/hydra/body)
 

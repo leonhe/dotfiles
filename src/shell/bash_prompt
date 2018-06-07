@@ -5,7 +5,7 @@
 enable_color_support() {
 
     if [[ $COLORTERM == gnome-* && $TERM == xterm ]] \
-           && infocmp gnome-256color &> /dev/null; then
+        && infocmp gnome-256color &> /dev/null; then
         export TERM="gnome-256color"
     elif infocmp xterm-256color &> /dev/null; then
         export TERM="xterm-256color"
@@ -18,8 +18,6 @@ enable_color_support() {
     . "colors/$OS/bash_colors"
 
 }
-
-
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -101,21 +99,100 @@ get_git_repository_details() {
 
 set_prompts() {
 
-    # White="$(tput setaf 7)"
-    # Cyan="$(tput setaf 6)"
-    # Blue="$(tput setaf 1)"
-    # Magenta="$(tput setaf 5)"
-    # Seco="$Cyan -$Magenta$White $ $White "
-    # export PS1='\[$Magenta\] \w\[$Blue\]$(__git_ps1)\n$Seco'
+    local bold=$(tput bold 2> /dev/null)
+    local reset=$(tput sgr0 2> /dev/null)
 
-    if [[ ${EUID} == 0 ]] ; then
-        PS1='\[\033[01m\][ \[\033[01;31m\]\u@\h \[\033[00m\]\[\033[01m\]] \[\033[01;32m\]\w\[\033[00m\]\n\[\033[01;31m\]$\[\033[00m\] '
-    else
-        PS1='\[\033[01m\][ \[\033[01;34m\]\u@\h \[\033[00m\]\[\033[01m\]] \[\033[01;32m\]\w\[\033[00m\]\n\[\033[01;34m\]$\[\033[00m\] '
+    local cyan=""
+    local green=""
+    local orange=""
+    local white=""
+    local yellow=""
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    if [ "$(tput colors 2> /dev/null || printf "0")" -ge 256 ]; then
+
+        # Solarized colors.
+        # https://github.com/altercation/solarized/tree/master/iterm2-colors-solarized#the-values
+
+        cyan=$(tput setaf 37)
+        green=$(tput setaf 64)
+        orange=$(tput setaf 166)
+        white=$(tput setaf 15)
+        yellow=$(tput setaf 136)
+
     fi
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    # Prompt Statement variables.
+    # http://ss64.com/bash/syntax-prompt.html
 
+    # ------------------------------------------------------------------
+    # | PS1 - Default interactive prompt                               |
+    # ------------------------------------------------------------------
+
+    PS1="\[\033]0;\W\007\]" # Terminal title (set to the
+                            # current working directory)
+
+    PS1+="$reset$bold"
+    PS1+="$orange\u"        # Username
+    PS1+="$white@"
+    PS1+="$yellow\h"        # Host
+    PS1+="$white: "
+    PS1+="$green\w"         # Working directory
+    PS1+="\$(get_git_repository_details \"$white on $cyan\")"
+    PS1+="\n"
+    PS1+="\[$reset\]\[$white\]$ \[$reset\]"
+
+    export PS1
+
+    # ------------------------------------------------------------------
+    # | PS2 - Continuation interactive prompt                          |
+    # ------------------------------------------------------------------
+
+    PS2="⚡ "
+
+    export PS2
+
+    # ------------------------------------------------------------------
+    # | PS4 - Debug prompt                                             |
+    # ------------------------------------------------------------------
+
+    # e.g:
+    #
+    # The GNU `date` command has the `%N` interpreted sequence while
+    # other implementations don't (on macOS `gdate` can be used instead
+    # of the native `date` if the `coreutils` package has been installed).
+    #
+    # local dateCmd=""
+    #
+    # if [ "$(date +%N)" != "N" ] || \
+    #    [ ! -x "$(command -v "gdate")" ]; then
+    #    dateCmd="date +%s.%N"
+    # else
+    #    dateCmd="gdate +%s.%N"
+    # fi
+    #
+    # PS4="+$( tput cr && tput cuf 6 &&
+    #          printf "$yellow %s $green%6s $reset" "$($dateCmd)" "[$LINENO]" )"
+    #
+    # PS4 output:
+    #
+    #   ++    1357074705.875970000  [123] '[' 1 == 0 ']'
+    #   └──┬─┘└────┬───┘ └───┬───┘ └──┬─┘ └──────┬─────┘
+    #      │       │         │        │          │
+    #      │       │         │        │          └─ command
+    #      │       │         │        └─ line number
+    #      │       │         └─ nanoseconds
+    #      │       └─ seconds since 1970-01-01 00:00:00 UTC
+    #      └─ depth-level of the subshell
+
+    PS4="+$( tput cr 2> /dev/null;
+             tput cuf 6 2> /dev/null;
+             printf "%s" "$reset" )"
+
+    export PS4
 
 }
 

@@ -136,18 +136,6 @@ Version 2017-04-19"
 (global-set-key (kbd "C-c t") 'xah-toggle-letter-case)
    #+end_src
 
-** SLQ ORACLE
-   #+begin_src emacs-lisp
-(defun cesco/sqlplus ()
-  (interactive)
-  (sqlplus "system/oracle@localhost:1521"))
-
-(setq sql-oracle-login-params
-      '((user     :default "system")
-        (password :default (password-read "Password:" "oracle"))
-        (database :default "localhost:1521/xe")))
-   #+end_src
-
 ** HideShow Folding
    #+begin_src emacs-lisp
 (use-package hideshow
@@ -555,7 +543,6 @@ the entire subtree."
           (setq eyebrowse-wrap-around t
                 eyebrowse-new-workspace t)
           (eyebrowse-mode 1)
-          (eyebrowse-rename-window-config 0 "Cesco")
           (eyebrowse-switch-to-window-config-0))
   :diminish eyebrowse-mode)
 
@@ -646,41 +633,6 @@ the entire subtree."
   (mapconcat 'identity (reverse (split-string filename "\\.")) "."))
 
 
-(use-package dired
-  :ensure nil
-  :init
-  (let ((gls "/usr/local/bin/gls"))
-    (if (file-exists-p gls) (setq insert-directory-program gls)))
-  :config
-  (define-key dired-mode-map (kbd "C-l") 'my-dired-view-file)
-  (define-key dired-mode-map (kbd "C-u") 'dired-up-directory)
-  (setq dired-listing-switches "-aBhl  --group-directories-first ")
-  (define-key dired-mode-map (kbd "H") 'tabbar-backward)
-  (define-key dired-mode-map (kbd "L") 'tabbar-forward)
-  (define-key dired-mode-map (kbd "q") 'evil-delete-buffer)
-  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-  (define-key dired-mode-map (kbd "TAB") 'dired-find-alternate-file)
-  (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file ".."))))
-
-(use-package dired-x
-  :after dired
-  :config
-  (progn
-    (setq dired-omit-files (concat dired-omit-files "\\|^.DS_STORE$\\|^.projectile$"))
-)
-  :init
-  (progn
-    (setq diredp-hide-details-propagate-flag nil)
-    (setq diredp-hide-details-initially-flag nil)
-    (setq dired-omit-verbose nil)
-    (add-hook 'dired-mode-hook #'dired-omit-mode)
-    ))
-
-(use-package all-the-icons-dired
-  :after dired
-  :commands (all-the-icons-dired-mode)
-  :init
-  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
    #+end_src
 
 ** Zoom-window

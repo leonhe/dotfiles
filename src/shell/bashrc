@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 . ~/.bash_profile
 
 [ -s "/home/cescoferraro/.jabba/jabba.sh" ] && source "/home/cescoferraro/.jabba/jabba.sh"

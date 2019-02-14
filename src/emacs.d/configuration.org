@@ -1046,6 +1046,7 @@ the entire subtree."
 	  (message "have just popped neotree")))))
   )
 
+(defun cesco/neotree-pop () ( neotree-dir (file-name-directory buffer-file-name) ) )
 (defun cesco/neotree-evil ()
   (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
   (define-key evil-normal-state-local-map (kbd "I") 'neotree-hidden-file-toggle)
@@ -1069,6 +1070,7 @@ the entire subtree."
   :ensure all-the-icons
   :bind ([f2] . neotree-projectile-action)
   :config (evil-leader/set-key "m" 'cesco/neotree-toogle)
+  :config (evil-leader/set-key "," 'cesco/neotree-pop)
   :init (progn
 	  (setq neo-theme (if window-system 'icons 'nerd)) ; 'classic, 'nerd, 'ascii, 'arrow
       (setq neo-force-change-root t)
@@ -1710,7 +1712,7 @@ That is, a string used to represent it on the tab bar."
       (if (file-exists-p (concat ( projectile-project-root ) "tsconfig.json"))
 	  (progn
 	    (setq flycheck-typescript-tsconfig . ( (concat projectile-project-root "tsconfig.json" )))
-	    ;; (flycheck-select-checker 'typescript-tslint-cesco)
+	    (flycheck-select-checker 'typescript-tslint-cesco)
 	    )
         (cesco/tslint)
 	)))
@@ -2001,8 +2003,7 @@ If COUNT is given, move COUNT - 1 lines downward first."
     "q" 'kill-emacs
     "w" 'delete-window
     "e" 'kill-this-buffer
-    "," 'previous-buffer
-    "," 'previous-buffer
+    "," 'neotree-cesco-pop
     "t" (lambda () (interactive)  (flycheck-select-checker 'typescript-tslint-cesco) )
     "a" 'helm-projectile-ag
     "r" 'helm-recentf
